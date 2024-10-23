@@ -17,7 +17,7 @@ const CancelModal = ({ onClose, onConfirm }) => {
     <div
       className="fixed inset-0 flex items-center justify-center z-50 font-aldrich"
       style={{
-        background: 'rgba(0, 0, 0, 0.5)' // Semi-transparent background
+        background: 'rgba(0, 0, 0, 0.8)' // Semi-transparent background
       }}
     >
       <div

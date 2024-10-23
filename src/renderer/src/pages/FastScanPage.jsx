@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import modalBackground from '../assets/border/bawah-scanning.svg'
 import ArrowPattern from '../components/ArrowPattern'
 import CancelModal from '../components/modal/Cancel'
-import bgImage from '../assets/bg-darkmode.svg'
+import bgImage from '../assets/bg-darkmode.png'
 import plusSign from '../assets/plus-sign.svg'
 import buttonViewMore from '../assets/border/view-more.svg'
 import buttonCancel from '../assets/border/cancel.svg'
@@ -27,7 +27,7 @@ const FastScanPage = () => {
   useEffect(() => {
     const fetchScanProgress = async () => {
       try {
-        const response = await fetch(`https://dummyjson.com/c/14af-400b-4347-869a`)
+        const response = await fetch(`http://172.15.1.36:1337/v1/fast-scan`)
         const data = await response.json()
 
         if (data.status === 200) {
@@ -41,15 +41,33 @@ const FastScanPage = () => {
         console.error('Error fetching scan progress:', error)
       }
     }
+    
+    // Delay 2 detik sebelum memanggil API
+    const startFetch = () => {
+      const interval = setInterval(() => {
+        fetchScanProgress()
+      }, 3000) // Panggil API setiap 3 detik
 
-    const interval = setInterval(() => {
-      fetchScanProgress()
-    }, 3000)
+      return () => clearInterval(interval) // Clean up interval on component unmount
+    }
 
-    return () => clearInterval(interval)
+    const delay = setTimeout(startFetch, 2000) // Delay sebelum memulai fetch API
+
+    return () => clearTimeout(delay) // Clean up timeout on component unmount
   }, [])
 
   const displayedLogs = showAllLogs ? logData : logData.slice(0, 5)
+
+  useEffect(() => {
+    if (progress === 100) {
+      const delayTimeout = setTimeout(() => {
+        navigate('/result-fast-scan')
+      }, 1000) // Delay 1 detik sebelum pindah ke halaman 'result-fast-scan'
+
+      return () => clearTimeout(delayTimeout)
+    }
+  }, [progress, navigate])
+
 
   return (
     <div
@@ -87,11 +105,11 @@ const FastScanPage = () => {
             minHeight: '385px'
           }}
         >
-          <img src={plusSign} alt="Plus Sign" className="absolute top-[0px] left-[-12px] w-6 h-6" />
+          <img src={plusSign} alt="Plus Sign" className="absolute top-[0px] left-[-13px] w-6 h-6" />
           <img
             src={plusSign}
             alt="Plus Sign"
-            className="absolute bottom-[0px] right-[-12px] w-6 h-6"
+            className="absolute bottom-[0px] right-[-13px] w-6 h-6"
           />
 
           <div className="flex flex-col items-center justify-center">
@@ -105,7 +123,7 @@ const FastScanPage = () => {
             >
               {logData.length === 0 ? (
                 <p className="text-center text-gray-500">No log data available</p>
-              ) : (
+              ) : ( 
                 <div className="space-y-2 w-full">
                   {displayedLogs.map((log, i) => (
                     <div key={i} className="flex justify-between py-2 px-4">

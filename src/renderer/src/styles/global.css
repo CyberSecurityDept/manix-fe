@@ -3,3 +3,16 @@
 @tailwind utilities;
 
 
+@keyframes progressAnimation {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+  
+  .animate-progress {
+    animation: progressAnimation 2s linear infinite;
+  }
+  

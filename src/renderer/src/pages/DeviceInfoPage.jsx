@@ -3,7 +3,7 @@ import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 import CreatableSelect from 'react-select/creatable'
 import { useNavigate, Link } from 'react-router-dom'
-import bgDarkmode from '../assets/bg-darkmode.svg'
+import bgDarkmode from '../assets/bg-darkmode.png'
 import plusSign from '../assets/plus-sign.svg'
 import historyIcon from '../assets/history-icon.svg'
 import backIcon from '../assets/back-Icon.svg'
@@ -24,7 +24,7 @@ const DeviceInfoPage = () => {
 
   // Fungsi untuk memanggil API saat komponen dimuat
   useEffect(() => {
-    fetch('https://dummyjson.com/c/2566-5947-4dd2-b950')
+    fetch('http://172.15.1.36:1337/v1/device-overview')
       .then((response) => response.json())
       .then((data) => {
         console.log('Device Data:', data)
@@ -39,6 +39,7 @@ const DeviceInfoPage = () => {
         setLoading(false) // Matikan loading jika ada error
       })
   }, [])
+
 
   // Fungsi untuk menangani opsi baru yang dibuat
   const handleCreate = (inputValue) => {
@@ -303,12 +304,16 @@ const DeviceInfoPage = () => {
 
         {/* Full Scan Button */}
         <button
-          className="w-[389px] h-[120px] text-xl font-bold bg-transparent border border-teal-400 hover:bg-teal-700 rounded-md shadow-lg flex flex-col justify-center items-center relative"
+          className={`w-[389px] h-[120px] text-xl font-bold bg-transparent border border-teal-400 hover:bg-teal-700 rounded-md shadow-lg flex flex-col justify-center items-center relative ${
+            !selectedName ? 'cursor-not-allowed opacity-50' : ''
+          }`}
           style={{
             backgroundImage: `url(${buttonScan})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}
+          onClick={() => navigate('/maintenance')}
+          disabled={!selectedName}
         >
           FULL SCAN
           <p className="text-sm mt-2">Perform a comprehensive security check of your device.</p>

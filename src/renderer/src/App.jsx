@@ -7,6 +7,9 @@ import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 import FastScanPage from './pages/FastScanPage';
 import ResultFastScanPage from './pages/ResultFastScanPage';
 import HistoryPage from './pages/HistoryPage';
+import CaseManagementDashboard from './pages/CaseManagement/Dashboard';
+import OTA from './pages/OtaPage';
+import UnderMaintenance from './pages/UnderMaintenance';
 
 function App() {
   // Pastikan ipcHandle hanya dipanggil jika window.electron ada
@@ -23,6 +26,12 @@ function App() {
       <Routes>
         {/* Route untuk halaman utama */}
         <Route path="/" element={<HomePage />} />
+
+        {/* Route untuk maintenance*/}
+        <Route path="/maintenance" element={<UnderMaintenance />} />
+
+        {/* Route untuk OTA */}
+        <Route path="/ota" element={<OTA />} />
 
         {/* Route untuk halaman SearchDevicePage */}
         <Route path="/search-device" element={<SearchDevicePage />} />
@@ -41,6 +50,9 @@ function App() {
 
         {/* Route untuk halaman HistoryPage */}
         <Route path="/history" element={<HistoryPage />} />
+
+        {/* Route untuk halaman CaseManagementDashboard*/}
+        <Route path="/dashboard" element={<CaseManagementDashboard/>} />
       </Routes>
     </Router>
   );

@@ -49,3 +49,16 @@
   border-width: 0 2px 2px 0;
   transform: rotate(45deg); /* Creates the checkmark */
 }
+
+/* Specific style for select all checkbox */
+.custom-checkbox.select-all:checked + .checkmark::after {
+  content: ''; /* Reset content to ensure the tick is not displayed */
+  display: block;
+  left: 6px;
+  top: 9px;
+  width: 8px;
+  height: 2px;
+  background-color: #ffff;
+  border: none; /* Remove border styles */
+  transform: none; /* No rotation for minus sign */
+}

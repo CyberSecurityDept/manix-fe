@@ -4,17 +4,39 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()]
+    plugins: [externalizeDepsPlugin()],
+    build: {
+      rollupOptions: {
+        external: ['@electron-toolkit/utils'] // Sesuaikan dengan modul yang Anda gunakan
+      }
+    }
   },
   preload: {
-    plugins: [externalizeDepsPlugin()]
+    plugins: [externalizeDepsPlugin()],
+    build: {
+      rollupOptions: {
+        external: ['@electron-toolkit/preload'] // Sesuaikan dengan modul yang Anda gunakan
+      }
+    }
   },
   renderer: {
     resolve: {
       alias: {
-        '@renderer': resolve('src/renderer/src')
+        '@': resolve('src/renderer/src') // Menggunakan alias '@' untuk kemudahan impor
       }
     },
-    plugins: [react()]
+    plugins: [react()],
+    build: {
+      rollupOptions: {
+        input: {
+          index: resolve(__dirname, 'src/renderer/index.html')
+        },
+        output: {
+          assetFileNames: 'assets/[name].[hash][extname]'
+        }
+      },
+      publicDir: resolve('src/renderer/src/assets'),
+      assetsInlineLimit: 0
+    }
   }
 })

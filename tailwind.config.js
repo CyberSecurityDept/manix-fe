@@ -5,7 +5,7 @@ module.exports = {
     extend: {
       fontFamily: {
         aldrich: ['Aldrich', 'sans-serif'],
-        helvetica: ['Helvetica', 'Arial', 'sans-serif'],
+        roboto: ['Roboto', 'Helvetica', 'Arial', 'sans-serif'],
       },
       width: {
         '628': '628px',

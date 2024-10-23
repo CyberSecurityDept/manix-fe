@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import '../styles/Checkbox.css'
 import { Link } from 'react-router-dom'
-import bgImage from '../assets/bg-darkmode.svg'
+import bgImage from '../assets/bg-darkmode.png'
 import RemoveModal from '../components/modal/Delete'
 import CompleteModal from '../components/modal/Complete'
 import AfterCompleteModal from '../components/modal/AfterComplete'
@@ -402,11 +402,11 @@ const ResultFastScanPage = () => {
               <span className="text-start">Date Time</span>
               <span className="text-center">Name</span>
               <div className="flex items-end justify-end">
-                {/* Checkbox without text */}
+                {/* Checkbox for select all */}
                 <label className="checkbox-container">
                   <input
                     type="checkbox"
-                    className="custom-checkbox"
+                    className="custom-checkbox select-all"
                     onChange={handleSelectAllChange}
                     checked={selectAll}
                   />
@@ -426,7 +426,7 @@ const ResultFastScanPage = () => {
                     <span>msoffice.exe</span>
                   </div>
                   <div className="flex items-end justify-end">
-                    {/* Checkbox without text */}
+                    {/* Checkbox at table */}
                     <label className="checkbox-container">
                       <input
                         type="checkbox"

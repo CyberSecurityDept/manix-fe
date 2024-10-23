@@ -35,6 +35,12 @@ function createWindow() {
   }
 }
 
+ipcMain.on('get-asset-path', (event) => {
+  event.returnValue = process.env.NODE_ENV === 'development'
+    ? join(__dirname, '../../src/renderer/src/assets')
+    : join(process.resourcesPath, 'assets')
+})
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.

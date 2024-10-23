@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
-import bgDarkmode from '../assets/bg-darkmode.svg';
+import bgDarkmode from '../assets/bg-darkmode.png';
 import borderImage from '../assets/border/history.svg';
 import backIcon from '../assets/back-Icon.svg';
 import filterIcon from '../assets/filter-history-page.svg';
@@ -13,6 +13,8 @@ const HistoryPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [sortLastScanAsc, setSortLastScanAsc] = useState(true);
+  const [sortSecurityPercentageAsc, setSortSecurityPercentageAsc] = useState(true);
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -31,6 +33,28 @@ const HistoryPage = () => {
     };
     fetchData();
   }, []);
+
+    // Fungsi untuk mengurutkan data berdasarkan last_scan
+    const handleSortLastScan = () => {
+      const sortedData = [...data].sort((a, b) => 
+        sortLastScanAsc 
+          ? new Date(b.last_scan) - new Date(a.last_scan)
+          : new Date(a.last_scan) - new Date(b.last_scan)
+      );
+      setData(sortedData);
+      setSortLastScanAsc(!sortLastScanAsc);
+    };
+  
+    // Fungsi untuk mengurutkan data berdasarkan security_percentage
+    const handleSortSecurityPercentage = () => {
+      const sortedData = [...data].sort((a, b) => 
+        sortSecurityPercentageAsc 
+          ? b.security_percentage - a.security_percentage
+          : a.security_percentage - b.security_percentage
+      );
+      setData(sortedData);
+      setSortSecurityPercentageAsc(!sortSecurityPercentageAsc);
+    };
 
   // Reset halaman ke 1 setiap kali searchTerm berubah
   useEffect(() => {
@@ -98,13 +122,13 @@ const HistoryPage = () => {
                   <th className="p-2 text-center">
                     <div className="flex items-center justify-center">
                       Last Scan
-                      <img src={filterIcon} alt="Filter Icon" className="ml-1 w-3 h-3 cursor-pointer" />
+                      <img src={filterIcon} alt="Filter Icon" className="ml-1 w-3 h-3 cursor-pointer" onClick={handleSortLastScan} />
                     </div>
                   </th>
                   <th className="p-2 text-center">
                     <div className="flex items-center justify-center">
                       Security Percentage
-                      <img src={filterIcon} alt="Filter Icon" className="ml-1 w-3 h-3 cursor-pointer" />
+                      <img src={filterIcon} alt="Filter Icon" className="ml-1 w-3 h-3 cursor-pointer" onClick={handleSortSecurityPercentage} />
                     </div>
                   </th>
                   <th className="p-2 text-center">Action</th>
