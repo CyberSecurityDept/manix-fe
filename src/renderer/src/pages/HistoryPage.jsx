@@ -14,8 +14,10 @@ const HistoryPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [sortLastScanAsc, setSortLastScanAsc] = useState(true);
+  const [sortNumberAsc, setSortNumberAsc] = useState(true);
   const [sortSecurityPercentageAsc, setSortSecurityPercentageAsc] = useState(true);
-  const itemsPerPage = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(10); 
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,27 +36,40 @@ const HistoryPage = () => {
     fetchData();
   }, []);
 
-    // Fungsi untuk mengurutkan data berdasarkan last_scan
-    const handleSortLastScan = () => {
-      const sortedData = [...data].sort((a, b) => 
-        sortLastScanAsc 
-          ? new Date(b.last_scan) - new Date(a.last_scan)
-          : new Date(a.last_scan) - new Date(b.last_scan)
-      );
-      setData(sortedData);
-      setSortLastScanAsc(!sortLastScanAsc);
-    };
-  
-    // Fungsi untuk mengurutkan data berdasarkan security_percentage
-    const handleSortSecurityPercentage = () => {
-      const sortedData = [...data].sort((a, b) => 
-        sortSecurityPercentageAsc 
-          ? b.security_percentage - a.security_percentage
-          : a.security_percentage - b.security_percentage
-      );
-      setData(sortedData);
-      setSortSecurityPercentageAsc(!sortSecurityPercentageAsc);
-    };
+  // Fungsi untuk mengubah jumlah item per halaman
+  const handleItemsPerPageChange = (number) => {
+    setItemsPerPage(number);
+    setDropdownOpen(false); // Tutup dropdown setelah memilih
+    setCurrentPage(1); // Reset ke halaman 1 saat jumlah item diubah
+  };
+
+  const handleSortNumber = () => {
+    const sortedData = [...data].sort((a, b) => 
+      sortNumberAsc ? a.id - b.id : b.id - a.id
+    );
+    setData(sortedData);
+    setSortNumberAsc(!sortNumberAsc);
+  };
+
+  const handleSortLastScan = () => {
+    const sortedData = [...data].sort((a, b) => 
+      sortLastScanAsc 
+        ? new Date(b.last_scan) - new Date(a.last_scan)
+        : new Date(a.last_scan) - new Date(b.last_scan)
+    );
+    setData(sortedData);
+    setSortLastScanAsc(!sortLastScanAsc);
+  };
+
+  const handleSortSecurityPercentage = () => {
+    const sortedData = [...data].sort((a, b) => 
+      sortSecurityPercentageAsc 
+        ? b.security_percentage - a.security_percentage
+        : a.security_percentage - b.security_percentage
+    );
+    setData(sortedData);
+    setSortSecurityPercentageAsc(!sortSecurityPercentageAsc);
+  };
 
   // Reset halaman ke 1 setiap kali searchTerm berubah
   useEffect(() => {
@@ -105,11 +120,17 @@ const HistoryPage = () => {
 
         <div className="relative w-full p-10 shadow-lg text-center"
           style={{ backgroundImage: `url(${borderImage})`, backgroundPosition: 'center', backgroundSize: 'contain', backgroundRepeat: 'no-repeat', height: '700px' }}>
-          <div style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)', height: '544px' }}>
+          <div style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)', height: '544px', overflowY: itemsPerPage > 10 ? 'auto' : 'visible' }}>
             <table className="table-auto w-full text-left text-sm">
               <thead style={{ backgroundColor: '#00B3A2' }}>
                 <tr className="text-black">
-                  <th className="p-2 text-center">No</th>
+                  {/* Table Headers */}
+                  <th className="p-2 text-center">
+                    <div className="flex items-center justify-center">
+                      No
+                      <img src={filterIcon} alt="Filter Icon" className="ml-1 w-3 h-3 cursor-pointer" onClick={handleSortNumber}/>
+                    </div>
+                  </th>
                   <th className="p-2 text-center">Name</th>
                   <th className="p-2 text-center">
                     <div className="flex items-center justify-center">
@@ -139,13 +160,7 @@ const HistoryPage = () => {
                   Array.from({ length: itemsPerPage }).map((_, index) => (
                     <tr key={index}>
                       <td className="p-2 text-center"><Skeleton /></td>
-                      <td className="p-2 text-center"><Skeleton /></td>
-                      <td className="p-2 text-center"><Skeleton /></td>
-                      <td className="p-2 text-center"><Skeleton /></td>
-                      <td className="p-2 text-center"><Skeleton /></td>
-                      <td className="p-2 text-center"><Skeleton /></td>
-                      <td className="p-2 text-center"><Skeleton /></td>
-                      <td className="p-2 text-center"><Skeleton width={70} /></td>
+                      {/* Table Skeletons */}
                     </tr>
                   ))
                 ) : (
@@ -168,8 +183,31 @@ const HistoryPage = () => {
             </table>
           </div>
 
-          <div className="mt-4 flex justify-between items-center px-4">
-            <div className="text-teal-400">Showing {itemsPerPage}</div>
+          <div className="mt-4 flex justify-between items-center px-4 relative">
+            {/* Dropdown Menu */}
+            <div className="relative inline-block text-left">
+              <div>
+                <button type="button" className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-[#091817] px-3 py-2 text-sm  text-[#fff] shadow-sm  hover:bg-[#1a2c2b]" id="menu-button" aria-expanded="true" aria-haspopup="true" onClick={() => setDropdownOpen(!dropdownOpen)}>
+                  Showing {itemsPerPage}
+                  <svg className="-mr-1 h-5 w-5 text-[#00FFE7]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+                    <path fillRule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+
+              {dropdownOpen && (
+                <div className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-[#091817] shadow-lg ring-1 ring-teal-400 ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex="-1">
+                  <div className="py-1" role="none">
+                    <a className="block px-4 py-2 text-sm text-[#00FFE7] hover:bg-teal-700" role="menuitem" tabIndex="-1" onClick={() => handleItemsPerPageChange(5)}>5 items</a>
+                    <a className="block px-4 py-2 text-sm text-[#00FFE7] hover:bg-teal-700" role="menuitem" tabIndex="-1" onClick={() => handleItemsPerPageChange(10)}>10 items</a>
+                    <a className="block px-4 py-2 text-sm text-[#00FFE7] hover:bg-teal-700" role="menuitem" tabIndex="-1" onClick={() => handleItemsPerPageChange(25)}>25 items</a>
+                    <a className="block px-4 py-2 text-sm text-[#00FFE7] hover:bg-teal-700" role="menuitem" tabIndex="-1" onClick={() => handleItemsPerPageChange(50)}>50 items</a>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Pagination Controls */}
             <div className="flex items-center">
               <button onClick={() => handlePageChange(currentPage - 1)} className="px-2 py-1 text-[#00FFE7] rounded-md hover:bg-[#00FFE7] hover:text-black transition"
                 disabled={currentPage === 1} style={{ height: '36px' }}>Prev</button>

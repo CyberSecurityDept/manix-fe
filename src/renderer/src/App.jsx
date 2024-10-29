@@ -10,6 +10,7 @@ import HistoryPage from './pages/HistoryPage';
 import CaseManagementDashboard from './pages/CaseManagement/Dashboard';
 import OTA from './pages/OtaPage';
 import UnderMaintenance from './pages/UnderMaintenance';
+import IframePage from './pages/IframePage';
 
 function App() {
   // Pastikan ipcHandle hanya dipanggil jika window.electron ada
@@ -32,6 +33,9 @@ function App() {
 
         {/* Route untuk OTA */}
         <Route path="/ota" element={<OTA />} />
+
+        {/* Route untuk IframePage */}
+        <Route path="/iframe-page" element={<IframePage />} />
 
         {/* Route untuk halaman SearchDevicePage */}
         <Route path="/search-device" element={<SearchDevicePage />} />

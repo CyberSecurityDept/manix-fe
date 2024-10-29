@@ -9,12 +9,32 @@ function createWindow() {
     width: 900,
     height: 670,
     show: false,
+    frame: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: true, 
+      webviewTag: true, // Mengizinkan penggunaan webview
+      webSecurity: false,
+      fullscreen: true,
     }
+  })
+
+   // Set Content Security Policy
+   mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [
+          "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: https: http:;",
+          "script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http:;",
+          "frame-src 'self' https: http:;",
+          "img-src 'self' data: https: http:;",
+          "style-src 'self' 'unsafe-inline' https: http:;"
+        ].join(' ')
+      }
+    })
   })
 
   mainWindow.on('ready-to-show', () => {

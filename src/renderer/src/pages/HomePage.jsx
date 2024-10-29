@@ -1,6 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getAsset } from '../utils/assets'
+// import darkmodebutton from '../assets/darkmode-button.svg'
 
 const HomePage = () => {
   const navigate = useNavigate()
@@ -15,9 +16,7 @@ const HomePage = () => {
       }}
     >
       {/* Title Section */}
-      <h1 className="text-3xl font-semibold mb-4 font-aldrich">
-        What would you like to do?
-      </h1>
+      <h1 className="text-3xl font-semibold mb-4 font-aldrich">What would you like to do?</h1>
       <p className="mb-8 font-aldrich">
         <span
           className="text-teal-400 cursor-pointer hover:underline"
@@ -59,7 +58,7 @@ const HomePage = () => {
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}
-          onClick={() => navigate('/maintenance')}
+          onClick={() => navigate('/iframe-page')}
         >
           <span className="relative z-10">Case Management</span>
           <div className="absolute inset-0 bg-teal-700 opacity-0 hover:opacity-30 transition-opacity"></div>
@@ -67,12 +66,23 @@ const HomePage = () => {
       </div>
 
       {/* Dark Mode Toggle */}
-      <button
-        className="absolute bottom-[52px] left-[52px] flex items-center justify-between w-[143px] h-[50px] px-4 bg-[#091817] text-sm font-bold text-white border border-[#4FD1C5] hover:bg-teal-700 font-roboto"
+      {/* <button
+        className="absolute bottom-[52px] left-[52px] flex items-center justify-between w-[143px] h-[50px] px-2 bg-[#091817] text-sm font-bold text-white border border-[#4FD1C5] hover:bg-teal-700 font-roboto"
         onClick={() => console.log('Toggle dark mode')}
       >
         <span>Dark Mode</span>
-        <span className="text-xl text-[#4FD1C5]">☀️</span>
+        <div
+          className="w-11 h-10 bg-no-repeat bg-center bg-contain"
+          style={{ backgroundImage: `url(${darkmodebutton})` }}
+        />
+      </button> */}
+
+      {/* OTA Button */}
+      <button
+        className="absolute bottom-[52px] right-[52px] flex items-center justify-center w-[143px] h-[50px] bg-[#091817] text-sm font-bold text-white border border-[#4FD1C5] hover:bg-teal-700 font-roboto"
+        onClick={() => navigate('/ota')}
+      >
+        <span>OTA</span>
       </button>
     </div>
   )
