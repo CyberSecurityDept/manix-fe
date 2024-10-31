@@ -263,15 +263,6 @@ const DeviceInfoPage = () => {
               </div>
             </div>
           </div>
-
-          <p className="mb-2">
-            Previous scan history found on this device.<br></br>
-            Would you like to view it?
-          </p>
-
-          <Link to="/history" className="text-[#4FD1C5] underline">
-            History
-          </Link>
         </div>
       )}
 
