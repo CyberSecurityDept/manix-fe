@@ -10,7 +10,7 @@ const IframePage = () => {
   const [error, setError] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate()
-  const testUrl = 'http://10.8.0.7:8001/'
+  const testUrl = 'http://172.15.1.136:8001/'
 
   useEffect(() => {
     document.documentElement.style.overflow = 'hidden'
@@ -65,7 +65,7 @@ const IframePage = () => {
           <img 
             src={backIcon} 
             alt="Back"
-            className="w-full h-full object-contain"
+            className="w-12 h-12 object-contain"
           />
         </button>
       </div>

@@ -3,7 +3,7 @@ import bgDarkmode from '../assets/bg-darkmode.png'
 import plusSign from '../assets/plus-sign.svg'
 import Border from '../assets/border/App-border.svg'
 import UpdateBorder from '../assets/border/update.svg'
-import UpdateModal from '../components/modal/NewVersion'
+import UpdateModal from '../components/modal/Update'
 
 const OTA = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)

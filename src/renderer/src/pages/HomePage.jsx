@@ -58,7 +58,7 @@ const HomePage = () => {
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}
-          onClick={() => navigate('/iframe-page')}
+          onClick={() => navigate('/dashboard')}
         >
           <span className="relative z-10">Case Management</span>
           <div className="absolute inset-0 bg-teal-700 opacity-0 hover:opacity-30 transition-opacity"></div>

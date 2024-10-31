@@ -1,11 +1,15 @@
 import React, { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import bgDarkmode from '../assets/bg-darkmode.png'
 import modalBackground from '../assets/border-box.svg'
 import adbImage from '../assets/adb.svg'
 import plusSign from '../assets/plus-sign.svg'
 import historyIcon from '../assets/history-icon.svg'
 import backIcon from '../assets/chevronleft.svg'
-import { useNavigate } from 'react-router-dom'
+
+// Mengambil BASE_URL dari environment variables
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+const ENDPOINT = "/v1/check-device-status/";
 
 const ADBPage = () => {
   const navigate = useNavigate()
@@ -13,8 +17,8 @@ const ADBPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Gunakan URL baru di sini
-        const response = await fetch('http://172.15.1.36:1337/v1/check-device-status/')
+        // Gabungkan BASE_URL dengan ENDPOINT
+        const response = await fetch(`${BASE_URL}${ENDPOINT}`);
         const result = await response.json()
 
         // Akses data yang berada di dalam objek "data"
@@ -23,10 +27,14 @@ const ADBPage = () => {
         // Cek kondisi is_cable_connected dan is_adb_connected
         if (is_cable_connected && is_adb_connected) {
           // Pindah ke DeviceInfoPage jika kabel dan adb tersambung
-          navigate('/device-info')
+          setTimeout(() => {
+            navigate('/device-info')
+          }, 3000)
         } else if (!is_cable_connected && is_adb_connected) {
           // Pindah ke SearchDevicePage jika kabel tersambung tapi adb tidak tersambung
-          navigate('/search-device')
+          setTimeout(() => {
+            navigate('/search-device')
+          }, 3000)
         }
       } catch (error) {
         console.error('Error fetching data:', error)

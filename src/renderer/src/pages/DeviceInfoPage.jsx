@@ -9,6 +9,9 @@ import historyIcon from '../assets/history-icon.svg'
 import backIcon from '../assets/back-Icon.svg'
 import buttonScan from '../assets/Scan.svg'
 
+// Mengambil BASE_URL dari environment variables
+const BASE_URL = import.meta.env.VITE_BASE_URL
+
 const DeviceInfoPage = () => {
   const navigate = useNavigate()
 
@@ -24,7 +27,7 @@ const DeviceInfoPage = () => {
 
   // Fungsi untuk memanggil API saat komponen dimuat
   useEffect(() => {
-    fetch('http://172.15.1.36:1337/v1/device-overview')
+    fetch(`${BASE_URL}/v1/device-overview`)
       .then((response) => response.json())
       .then((data) => {
         console.log('Device Data:', data)
@@ -39,7 +42,6 @@ const DeviceInfoPage = () => {
         setLoading(false) // Matikan loading jika ada error
       })
   }, [])
-
 
   // Fungsi untuk menangani opsi baru yang dibuat
   const handleCreate = (inputValue) => {
@@ -57,7 +59,7 @@ const DeviceInfoPage = () => {
     }
 
     // Buat request URL dengan serial_number dan name di dalam query string
-    const requestUrl = `http://172.15.1.36:1337/v1/fast-scan/${deviceData.serial_number}?name=${selectedName.value}`
+    const requestUrl = `${BASE_URL}/v1/fast-scan/${deviceData.serial_number}?name=${selectedName.value}`
 
     // Log untuk memeriksa URL sebelum dikirim ke API
     console.log('Request URL:', requestUrl)
@@ -128,7 +130,7 @@ const DeviceInfoPage = () => {
           boxShadow: 'inset 0 0 15px 4px rgba(4, 209, 197, 0.5)',
           border: '1px solid transparent'
         }}
-      > 
+      >
         {/* Plus Sign (Kiri Atas Tengah) */}
         <img src={plusSign} alt="Plus Sign" className="absolute top-[-12px] left-[-12px] w-6 h-6" />
 
@@ -155,17 +157,12 @@ const DeviceInfoPage = () => {
           <div className="flex justify-center p-4">
             <div
               className="p-2 rounded-lg w-[187px] h-[187px]"
-              style={{
-                backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                boxShadow: 'inset -27px -27px 70px -20px rgba(4, 209, 197, 0.5)',
-                border: '1px solid transparent'
-              }}
             >
               {/* Skeleton jika loading */}
               {loading ? (
                 <Skeleton className="w-full h-full" />
               ) : (
-                <img src={deviceData.image} alt="Device" className="w-full h-full object-cover" />
+                <img src={deviceData?.image} alt="Device" className="w-full h-full object-cover" />
               )}
             </div>
           </div>
@@ -193,9 +190,9 @@ const DeviceInfoPage = () => {
                         borderColor: state.isFocused ? '#0C9A8D' : '#0C9A8D', // Ubah warna border
                         boxShadow: state.isFocused ? '0 0 0 1px #0C9A8D' : null, // Ubah shadow saat fokus
                         '&:hover': {
-                          borderColor: '#0C9A8D', // Ubah warna border saat hover
-                        },
-                      }),
+                          borderColor: '#0C9A8D' // Ubah warna border saat hover
+                        }
+                      })
                     }}
                   />
                 )}

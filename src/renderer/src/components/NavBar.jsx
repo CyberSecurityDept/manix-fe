@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import backIcon from '../assets/chevronleft.svg';  
 import settingsIcon from '../assets/settings.svg'; 
-import ActiveButton from '../assets/navbar-aktif.svg'; 
+import ActiveButton from '../assets/button-aktif.svg'; 
 import DeactiveButton from '../assets/navbar-nonaktif.svg'; 
 import Spotlight from '../assets/dashboard-spotlight.png';  
 
@@ -17,7 +17,7 @@ const Navbar = () => {
       </button>
 
       {/* Navbar (Middle Section) */}
-      <div className="flex space-x-4 relative mt-28">
+      <div className="flex space-x-14 relative mt-[100px]">
         {/* Tombol Dashboard */}
         <button
           onClick={() => setActiveButton('Dashboard')}
@@ -33,7 +33,7 @@ const Navbar = () => {
               src={Spotlight}
               alt="Dashboard Spotlight"
               className="absolute -bottom-[26px] left-1/2 transform -translate-x-1/2"
-              style={{ width: '198px' }}  
+              style={{ width: '200px' }}  
             />
           )}
         </button>
@@ -53,7 +53,7 @@ const Navbar = () => {
               src={Spotlight}
               alt="Case Management Spotlight"
               className="absolute -bottom-[26px] left-1/2 transform -translate-x-1/2"
-              style={{ width: '198px' }}  // Ubah ukuran sesuai kebutuhan
+              style={{ width: '200px' }}  // Ubah ukuran sesuai kebutuhan
             />
           )}
         </button>
@@ -73,7 +73,7 @@ const Navbar = () => {
               src={Spotlight}
               alt="Device Management Spotlight"
               className="absolute -bottom-[26px] left-1/2 transform -translate-x-1/2"
-              style={{ width: '198px' }}  // Ubah ukuran sesuai kebutuhan
+              style={{ width: '200px' }}  // Ubah ukuran sesuai kebutuhan
             />
           )}
         </button>
