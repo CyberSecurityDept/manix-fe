@@ -1,73 +1,92 @@
-import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import modalBackground from '../assets/border/bawah-scanning.svg'
-import ArrowPattern from '../components/ArrowPattern'
-import CancelModal from '../components/modal/Cancel'
-import bgImage from '../assets/bg-darkmode.png'
-import plusSign from '../assets/plus-sign.svg'
-import buttonViewMore from '../assets/border/view-more.svg'
-import buttonCancel from '../assets/border/cancel.svg'
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import modalBackground from '../assets/border/bawah-scanning.svg';
+import ArrowPattern from '../components/ArrowPattern';
+import CancelModal from '../components/modal/Cancel';
+import bgImage from '../assets/bg-darkmode.png';
+import plusSign from '../assets/plus-sign.svg';
+import buttonViewMore from '../assets/border/view-more.svg';
+import buttonCancel from '../assets/border/cancel.svg';
+
+// Mengambil BASE_URL dari environment variables
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const FastScanPage = () => {
-  const navigate = useNavigate()
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const [logData, setLogData] = useState([])
-  const [scanComplete, setScanComplete] = useState(false)
-  const [showAllLogs, setShowAllLogs] = useState(false)
+  const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [logData, setLogData] = useState([]);
+  const [scanComplete, setScanComplete] = useState(false);
+  const [showAllLogs, setShowAllLogs] = useState(false);
+  const [serialNumber, setSerialNumber] = useState(null);
 
-  const openModal = () => setIsModalOpen(true)
-  const closeModal = () => setIsModalOpen(false)
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
 
   const handleCancelScanning = () => {
-    setIsModalOpen(false)
-    navigate('/')
-  }
+    setIsModalOpen(false);
+    navigate('/');
+  };
 
   useEffect(() => {
+    // Mengambil serial_number dari localStorage
+    const savedSerialNumber = localStorage.getItem('serial_number');
+    if (savedSerialNumber) {
+      setSerialNumber(savedSerialNumber);
+    } else {
+      console.error('Serial number not found in localStorage.');
+      navigate('/'); // Pindah ke halaman lain jika serial_number tidak ada
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    let interval; // Declare interval variable
+
     const fetchScanProgress = async () => {
+      if (!serialNumber) return; // Tunggu sampai serialNumber tersedia
       try {
-        const response = await fetch(`http://172.15.1.36:1337/v1/fast-scan`)
-        const data = await response.json()
+        const response = await fetch(`${BASE_URL}/v1/scan-progress/${serialNumber}`);
+        const data = await response.json();
 
         if (data.status === 200) {
-          setProgress(parseInt(data.data.scan_percentage))
-          setScanComplete(data.data.scan_complete)
-          setLogData(data.data.log_process)
+          setProgress(parseInt(data.data.scan_percentage));
+          setScanComplete(data.data.scan_complete);
+          setLogData(data.data.log_process);
+
+          // Jika progress sudah mencapai 100%, hentikan interval
+          if (data.data.scan_percentage === 100) {
+            clearInterval(interval);
+          }
         } else {
-          console.error('Failed to fetch scan progress')
+          console.error('Failed to fetch scan progress');
         }
       } catch (error) {
-        console.error('Error fetching scan progress:', error)
+        console.error('Error fetching scan progress:', error);
       }
+    };
+
+    // Mulai interval jika serial_number sudah ada
+    if (serialNumber) {
+      const delay = setTimeout(() => {
+        interval = setInterval(fetchScanProgress, 3000); // Panggil API setiap 3 detik
+      }, 2000); // Delay sebelum memulai fetch API
+
+      return () => {
+        clearInterval(interval); // Clean up interval on component unmount
+        clearTimeout(delay); // Clean up timeout on component unmount
+      };
     }
-    
-    // Delay 2 detik sebelum memanggil API
-    const startFetch = () => {
-      const interval = setInterval(() => {
-        fetchScanProgress()
-      }, 3000) // Panggil API setiap 3 detik
-
-      return () => clearInterval(interval) // Clean up interval on component unmount
-    }
-
-    const delay = setTimeout(startFetch, 2000) // Delay sebelum memulai fetch API
-
-    return () => clearTimeout(delay) // Clean up timeout on component unmount
-  }, [])
-
-  const displayedLogs = showAllLogs ? logData : logData.slice(0, 5)
+  }, [serialNumber]); // Jalankan efek saat serialNumber tersedia
 
   useEffect(() => {
     if (progress === 100) {
       const delayTimeout = setTimeout(() => {
-        navigate('/result-fast-scan')
-      }, 1000) // Delay 1 detik sebelum pindah ke halaman 'result-fast-scan'
+        navigate('/result');
+      }, 1000); // Delay 1 detik sebelum pindah ke halaman 'result-fast-scan'
 
-      return () => clearTimeout(delayTimeout)
+      return () => clearTimeout(delayTimeout);
     }
-  }, [progress, navigate])
-
+  }, [progress, navigate]);
 
   return (
     <div
@@ -118,14 +137,16 @@ const FastScanPage = () => {
                 showAllLogs ? 'max-h-96 overflow-y-auto' : 'max-h-60 overflow-hidden'
               }`}
               style={{
-                transition: 'max-height 0.1s ease-in-out'
+                transition: 'max-height 0.1s ease-in-out',
+                overflowY: 'auto', // Allow vertical scrolling
+                overflowX: 'hidden', // Prevent horizontal scrolling
               }}
             >
               {logData.length === 0 ? (
                 <p className="text-center text-gray-500">No log data available</p>
               ) : ( 
                 <div className="space-y-2 w-full">
-                  {displayedLogs.map((log, i) => (
+                  {logData.slice().reverse().map((log, i) => ( // Reverse the order of logs
                     <div key={i} className="flex justify-between py-2 px-4">
                       <span className="w-1/4 text-left">{log.datetime}</span>
                       <span className="w-3/4 text-right">{log.log}</span>
@@ -168,7 +189,7 @@ const FastScanPage = () => {
 
       {isModalOpen && <CancelModal onClose={closeModal} onConfirm={handleCancelScanning} />}
     </div>
-  )
+  );
 }
 
-export default FastScanPage
+export default FastScanPage;

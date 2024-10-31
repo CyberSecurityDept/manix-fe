@@ -127,7 +127,7 @@ const DeviceInfoPage = () => {
         <Skeleton
           width={801}
           baseColor="#0B0C0B"
-          highlightColor="#121214"
+          highlightColor="#4E4B51"
           className="w-[801px] h-[480px]"
         />
       ) : (
@@ -275,29 +275,11 @@ const DeviceInfoPage = () => {
         </div>
       )}
 
-      {/* Tombol History */}
-      <button
-        className="absolute top-6 right-6 flex items-center focus:outline-none group"
-        onClick={() => navigate('/history')}
-      >
-        {/* Lingkaran dengan Ikon */}
-        <div className="relative w-[53px] h-[53px] flex items-center justify-center rounded-full border-2 border-[#4FD1C5] bg-[#0B1E1E] shadow-lg -mr-4 z-10 group-hover:bg-teal-700 transition-all duration-300">
-          <img src={historyIcon} alt="History Icon" className="w-8 h-8" />
-        </div>
-
-        {/* Persegi Panjang dengan Teks */}
-        <div className="w-[134px] h-[40px] bg-[#0B1E1E] rounded-r-lg border-t-2 border-b-2 border-r-2 border-[#4FD1C5] shadow-lg flex items-center justify-center group-hover:bg-teal-700 transition-all duration-300">
-          <span className="text-lg font-semibold tracking-wide text-white group-hover:text-black font-aldrich">
-            HISTORY
-          </span>
-        </div>
-      </button>
-
       {/* Tombol Scan */}
       {/* Fast Scan Button */}
       <div className="flex space-x-8 mt-6 font-aldrich">
         <button
-          className={`w-[389px] h-[120px] text-xl font-bold bg-transparent border border-teal-400 hover:bg-teal-700 rounded-md shadow-lg flex flex-col justify-center items-center relative ${
+          className={`w-[801px] h-[120px] text-xl font-bold bg-transparent border border-teal-400 hover:bg-teal-700 rounded-md shadow-lg flex flex-col justify-center items-center relative ${
             !selectedName ? 'cursor-not-allowed opacity-50' : ''
           }`}
           style={{
@@ -310,25 +292,6 @@ const DeviceInfoPage = () => {
         >
           FAST SCAN
           <p className="text-sm mt-2">Quickly check installed apps and accessibility settings.</p>
-          {/* Hover Overlay */}
-          <div className="absolute inset-0 bg-teal-700 opacity-0 hover:opacity-30 transition-opacity"></div>
-        </button>
-
-        {/* Full Scan Button */}
-        <button
-          className={`w-[389px] h-[120px] text-xl font-bold bg-transparent border border-teal-400 hover:bg-teal-700 rounded-md shadow-lg flex flex-col justify-center items-center relative ${
-            !selectedName ? 'cursor-not-allowed opacity-50' : ''
-          }`}
-          style={{
-            backgroundImage: `url(${buttonScan})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}
-          onClick={() => navigate('/maintenance')}
-          disabled={!selectedName}
-        >
-          FULL SCAN
-          <p className="text-sm mt-2">Perform a comprehensive security check of your device.</p>
           {/* Hover Overlay */}
           <div className="absolute inset-0 bg-teal-700 opacity-0 hover:opacity-30 transition-opacity"></div>
         </button>
