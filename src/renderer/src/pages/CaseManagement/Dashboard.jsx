@@ -25,7 +25,7 @@ const CaseManagementDashboard = () => {
           <input
             type="text"
             placeholder="Search..."
-            className="w-10/12 px-4 py-2 bg-gradient-to-b from-[#091817] to-[#0C1612] border border-[#4FD1C5] placeholder-gray-500 text-white"
+            className="w-10/12 px-4 py-2 bg-gradient-to-b from-[#091817] to-[#0C1612] border border-[#4FD1C5] text-white"
           />
           <button className="w-3/12 px-6 py-2 border border-y-[#0C9A8D] border-x-[#05564F] bg-gradient-to-b from-[#091817] to-[#0C1612] text-white hover:bg-teal-600">
             Search
