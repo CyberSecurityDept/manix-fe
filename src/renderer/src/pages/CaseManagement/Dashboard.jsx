@@ -25,11 +25,37 @@ const CaseManagementDashboard = () => {
           <input
             type="text"
             placeholder="Search..."
-            className="w-10/12 px-4 py-2 bg-gradient-to-b from-[#091817] to-[#0C1612] border border-[#4FD1C5] text-white"
+            className="w-10/12 px-4 py-2 bg-gradient-to-b from-[#091817] to-[#0C1612] border border-[#4FD1C5] text-white focus:outline-none placeholder-gray-500"
           />
           <button className="w-3/12 px-6 py-2 border border-y-[#0C9A8D] border-x-[#05564F] bg-gradient-to-b from-[#091817] to-[#0C1612] text-white hover:bg-teal-600">
             Search
           </button>
+        </div>
+      </div>
+
+      {/* Case Section */}
+      <div className="flex justify-center mt-10">
+        <div className="flex gap-4 w-full max-w-screen-lg">
+          {/* Left Section */}
+          <div className="grid gap-4 grid-cols-2">
+            {[...Array(4)].map((_, index) => (
+              <div
+                key={index}
+                className="w-[307px] h-[283px] border border-y-[#0C9A8D] border-x-[#05564F] bg-gradient-to-b from-[#091817] to-[#0C1612]"
+              ></div>
+            ))}
+          </div>
+
+          {/* Right Section */}
+          <div className="flex flex-col space-y-4">
+            <div className="w-[337px] h-[287px] border border-y-[#0C9A8D] border-x-[#05564F] bg-gradient-to-b from-[#091817] to-[#0C1612]"></div>
+            <button className="w-[389px] h-[120px] border border-[#4FD1C5] bg-gradient-to-b from-[#091817] to-[#0C1612] text-white hover:bg-teal-600">
+              Add Device
+            </button>
+            <button className="w-[389px] h-[120px] border border-[#4FD1C5] bg-gradient-to-b from-[#091817] to-[#0C1612] text-white hover:bg-teal-600">
+              Add Case
+            </button>
+          </div>
         </div>
       </div>
     </div>
