@@ -30,18 +30,24 @@ const DeviceInfoPage = () => {
     fetch(`${BASE_URL}/v1/device-overview`)
       .then((response) => response.json())
       .then((data) => {
-        console.log('Device Data:', data)
-        setDeviceData(data.data) // Simpan data device ke state
-        setNameOptions([{ value: data.data.name, label: data.data.name }]) // Set nama dari data API ke opsi
+        console.log('Device Data:', data);
+        setDeviceData(data.data); // Simpan data device ke state
+        setNameOptions([{ value: data.data.name, label: data.data.name }]); 
         // Simpan serial number ke local storage
-        localStorage.setItem('serial_number', data.data.serial_number)
-        setLoading(false)
+        localStorage.setItem('serial_number', data.data.serial_number);
+  
+        // Set loading state based on image URL
+        if (data.data.image && data.data.image !== 'http://image-example/') {
+          setLoading(false); // Stop loading if valid image URL
+        } else {
+          setLoading(true); // Keep loading if image is the placeholder
+        }
       })
       .catch((error) => {
-        console.error('Error fetching device data:', error)
-        setLoading(false) // Matikan loading jika ada error
-      })
-  }, [])
+        console.error('Error fetching device data:', error);
+        setLoading(false); // Matikan loading jika ada error
+      });
+  }, []);
 
   // Fungsi untuk menangani opsi baru yang dibuat
   const handleCreate = (inputValue) => {
