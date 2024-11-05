@@ -5,7 +5,7 @@ import modalBackground from '../assets/border-box.svg'
 import adbImage from '../assets/adb.svg'
 import plusSign from '../assets/plus-sign.svg'
 import historyIcon from '../assets/history-icon.svg'
-import backIcon from '../assets/chevronleft.svg'
+import backIcon from '../assets/back-Icon.svg'
 
 // Mengambil BASE_URL dari environment variables
 const BASE_URL = import.meta.env.VITE_BASE_URL;
