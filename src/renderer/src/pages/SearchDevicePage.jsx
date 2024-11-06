@@ -1,49 +1,49 @@
-import React, { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import bgDarkmode from '../assets/bg-darkmode.png'
-import modalBackground from '../assets/border-box.svg'
-import deviceImage from '../assets/device.svg'
-import plusSign from '../assets/plus-sign.svg'
-import historyIcon from '../assets/history-icon.svg'
-import backIcon from '../assets/back-Icon.svg'
+import React, { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import bgDarkmode from '../assets/bg-darkmode.png';
+import modalBackground from '../assets/border-box.svg';
+import deviceImage from '../assets/device.svg';
+import plusSign from '../assets/plus-sign.svg';
 
 // Mengambil BASE_URL dari environment variables
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const ENDPOINT = "/v1/check-device-status/";
 
 const SearchDevicePage = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const isFetchingRef = useRef(false); 
 
   useEffect(() => {
     const fetchData = async () => {
+      if (isFetchingRef.current) return; 
+
+      isFetchingRef.current = true; // Set fetching menjadi true
       try {
-
-        // Gabungkan BASE_URL dengan ENDPOINT
         const response = await fetch(`${BASE_URL}${ENDPOINT}`);
-        const result = await response.json()
+        const result = await response.json();
+        console.log('API Response:', result);
+        
+        const { is_cable_connected, is_adb_connected } = result.data;
 
-        // Akses data yang berada di dalam objek "data"
-        const { is_cable_connected, is_adb_connected } = result.data
-
-        // Cek kondisi is_cable_connected dan is_adb_connected
         if (is_cable_connected && is_adb_connected) {
-          // Pindah ke DeviceInfoPage jika kabel dan adb tersambung
-          setTimeout(() => {
-            navigate('/device-info')
-          }, 3000)
+          navigate('/device-info');
         } else if (is_cable_connected && !is_adb_connected) {
-          // Pindah ke ADBPage jika kabel tersambung tapi adb tidak tersambung
-          setTimeout(() => {
-            navigate('/adb-device')
-          }, 3000)
+          navigate('/adb-device');
         }
       } catch (error) {
-        console.error('Error fetching data:', error)
+        console.error('Error fetching data:', error);
+      } finally {
+        isFetchingRef.current = false; // Reset fetching state
       }
-    }
+    };
 
-    fetchData()
-  }, [navigate])
+    fetchData(); // Panggilan pertama
+    const intervalId = setInterval(fetchData, 500); // Atur interval untuk memanggil fetchData setiap 1 detik
+
+    return () => {
+      clearInterval(intervalId); // Bersihkan interval saat komponen unmounted
+    };
+  }, [navigate]); // Menggunakan navigate sebagai dependensi
 
   return (
     <div
@@ -77,11 +77,11 @@ const SearchDevicePage = () => {
         <img src={deviceImage} alt="Device" className="w-[325px] h-[207px] mb-6" />
 
         {/* Text Content */}
-        <h2 className="text-2xl font-bold font-aldrich">Cable are not connected</h2>
-        <p className="text-gray-300 mt-2 font-aldrich">Please check on cable connection</p>
+        <h2 className="text-2xl font-bold font-aldrich">Checking connection...</h2>
+        <p className="text-gray-300 mt-2 font-aldrich">Please wait...</p>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SearchDevicePage
+export default SearchDevicePage;
