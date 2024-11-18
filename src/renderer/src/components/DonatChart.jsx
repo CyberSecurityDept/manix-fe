@@ -83,9 +83,9 @@ import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
 const DonutChart = () => {
   const initialData = [
-    { name: 'Penghentian', value: 124, color: '#D4AF37', active: true },
-    { name: 'Persidangan', value: 100, color: '#35C294', active: true },
-    { name: 'Penyidikan', value: 100, color: '#3182CE', active: true }
+    { name: 'Penghentian', value: 124, color: '#8D8F00', active: true },
+    { name: 'Persidangan', value: 100, color: '#026840', active: true },
+    { name: 'Penyidikan', value: 100, color: '#013296', active: true }
   ];
 
   const [data, setData] = useState(initialData);
@@ -100,69 +100,43 @@ const DonutChart = () => {
   const activeData = data.filter(item => item.active);
   const total = activeData.reduce((sum, item) => sum + item.value, 0);
 
-  const renderCustomizedLegend = () => (
-    <div className="relative h-32 w-full mt-4">
-      {/* Top row - 2 items */}
-      <div className="absolute top-0 left-0 right-0 flex justify-between px-8">
-        {/* Penyidikan */}
-        <div
-          className="cursor-pointer"
-          onClick={() => handleLegendClick(data[2])}
-        >
-          <div
-            className={`text-white text-sm px-4 py-2 rounded transition-opacity duration-200 hover:opacity-80
-              ${!data[2].active ? 'opacity-40' : 'opacity-100'}`}
-            style={{ 
-              backgroundColor: data[2].color,
-              border: '2px solid rgba(255, 255, 255, 0.2)'
-            }}
-          >
-            {data[2].name}
-          </div>
-        </div>
+  const LegendButton = ({ entry }) => (
+    <div
+      className="cursor-pointer"
+      onClick={() => handleLegendClick(entry)}
+      style={{ width: '150px', height: '36px' }}
+    >
+      <div
+        className={`w-full h-full flex items-center justify-center text-white text-sm rounded transition-opacity duration-200 hover:opacity-80
+          ${!entry.active ? 'opacity-40' : 'opacity-100'}`}
+        style={{ 
+          backgroundColor: entry.color,
+          border: '2px solid rgba(255, 255, 255, 0.2)'
+        }}
+      >
+        {entry.name}
+      </div>
+    </div>
+  );
 
-        {/* Penghentian */}
-        <div
-          className="cursor-pointer"
-          onClick={() => handleLegendClick(data[0])}
-        >
-          <div
-            className={`text-white text-sm px-4 py-2 rounded transition-opacity duration-200 hover:opacity-80
-              ${!data[0].active ? 'opacity-40' : 'opacity-100'}`}
-            style={{ 
-              backgroundColor: data[0].color,
-              border: '2px solid rgba(255, 255, 255, 0.2)'
-            }}
-          >
-            {data[0].name}
-          </div>
-        </div>
+  const renderCustomizedLegend = () => (
+    <div className="relative h-24 w-[330px] mx-2">
+      {/* Top row - 2 items */}
+      <div className="absolute top-0 left-0 right-0 flex justify-between">
+        <LegendButton entry={data[2]} /> {/* Penyidikan */}
+        <LegendButton entry={data[0]} /> {/* Penghentian */}
       </div>
 
       {/* Bottom row - centered item */}
       <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2">
-        <div
-          className="cursor-pointer"
-          onClick={() => handleLegendClick(data[1])}
-        >
-          <div
-            className={`text-white text-sm px-8 py-2 rounded transition-opacity duration-200 hover:opacity-80
-              ${!data[1].active ? 'opacity-40' : 'opacity-100'}`}
-            style={{ 
-              backgroundColor: data[1].color,
-              border: '2px solid rgba(255, 255, 255, 0.2)'
-            }}
-          >
-            {data[1].name}
-          </div>
-        </div>
+        <LegendButton entry={data[1]} /> {/* Persidangan */}
       </div>
     </div>
   );
 
   return (
-    <div className="w-full max-w-md mx-auto bg-gray-900 p-6 rounded-lg">
-      <div className="h-64 relative">
+    <div style={{ width: '350px'}}>
+      <div className="h-48 relative">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie

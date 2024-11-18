@@ -1,48 +1,54 @@
-import React, { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import bgDarkmode from '../assets/bg-darkmode.png'
-import modalBackground from '../assets/border-box.svg'
-import adbImage from '../assets/adb.svg'
-import plusSign from '../assets/plus-sign.svg'
-import historyIcon from '../assets/history-icon.svg'
-import backIcon from '../assets/back-Icon.svg'
+import React, { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import bgDarkmode from '../assets/bg-darkmode.png';
+import modalBackground from '../assets/border-box.svg';
+import adbImage from '../assets/adb.svg';
+import plusSign from '../assets/plus-sign.svg';
 
 // Mengambil BASE_URL dari environment variables
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const ENDPOINT = "/v1/check-device-status/";
 
 const ADBPage = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const isFetchingRef = useRef(false); 
 
   useEffect(() => {
     const fetchData = async () => {
+      if (isFetchingRef.current) return; // Cegah pemanggilan jika sedang fetching
+
+      isFetchingRef.current = true; // Set fetching menjadi true
       try {
         // Gabungkan BASE_URL dengan ENDPOINT
         const response = await fetch(`${BASE_URL}${ENDPOINT}`);
-        const result = await response.json()
+        const result = await response.json();
+        console.log('API Response:', result);
 
         // Akses data yang berada di dalam objek "data"
-        const { is_cable_connected, is_adb_connected } = result.data
+        const { is_cable_connected, is_adb_connected } = result.data;
 
         // Cek kondisi is_cable_connected dan is_adb_connected
         if (is_cable_connected && is_adb_connected) {
           // Pindah ke DeviceInfoPage jika kabel dan adb tersambung
-          setTimeout(() => {
-            navigate('/device-info')
-          }, 3000)
+          navigate('/device-info');
         } else if (!is_cable_connected && is_adb_connected) {
           // Pindah ke SearchDevicePage jika kabel tersambung tapi adb tidak tersambung
-          setTimeout(() => {
-            navigate('/search-device')
-          }, 3000)
+          navigate('/search-device');
         }
       } catch (error) {
-        console.error('Error fetching data:', error)
+        console.error('Error fetching data:', error);
+      } finally {
+        isFetchingRef.current = false; // Reset fetching state
       }
-    }
+    };
 
-    fetchData()
-  }, [navigate])
+    fetchData(); // Panggilan pertama
+    const intervalId = setInterval(fetchData, 500); // Atur interval untuk memanggil fetchData setiap 500 milidetik
+
+    return () => {
+      clearInterval(intervalId); // Membersihkan interval saat komponen dibongkar
+    };
+  }, [navigate]);
 
   return (
     <div
@@ -53,19 +59,6 @@ const ADBPage = () => {
         backgroundPosition: 'center'
       }}
     >
-      {/* Tombol Back */}
-      <button
-        className="absolute top-6 left-6 flex items-center justify-center focus:outline-none group transition-all duration-300"
-        onClick={() => navigate('/')}
-        style={{
-          width: '68px',
-          height: '68px',
-          backgroundColor: 'transparent'
-        }}
-      >
-        <img src={backIcon} alt="Back Icon" className="w-10 h-10" />
-      </button>
-
       {/* Main Container */}
       <div
         className="relative w-[801px] h-[422px] p-6 flex flex-col justify-center items-center text-center"
@@ -95,35 +88,8 @@ const ADBPage = () => {
           Open setting, accessibility, ADB turn on.
         </p>
       </div>
-
-      {/* Tombol History */}
-      <button
-        className="absolute top-6 right-6 flex items-center focus:outline-none group"
-        onClick={() => navigate('/history')}
-        style={{ top: '24px', right: '24px' }}
-      >
-        {/* Lingkaran dengan Ikon */}
-        <div
-          className="relative flex items-center justify-center rounded-full border-2 border-[#4FD1C5] bg-[#0B1E1E] shadow-lg -mr-4 z-10 group-hover:bg-teal-700 transition-all duration-300"
-          style={{ width: '53px', height: '53px' }} // Ukuran lingkaran
-        >
-          <img src={historyIcon} alt="History Icon" className="w-8 h-8" />
-          {/* Border efek glowing */}
-          <div className="absolute inset-0 rounded-full border-[1px] border-[#4FD1C5]"></div>
-        </div>
-
-        {/* Persegi Panjang dengan Teks */}
-        <div
-          className="flex items-center justify-center bg-[#0B1E1E] rounded-r-lg border-t-2 border-b-2 border-r-2 border-[#4FD1C5] shadow-lg group-hover:bg-teal-700 transition-all duration-300"
-          style={{ width: '134px', height: '40px' }} // Ukuran persegi panjang
-        >
-          <span className="text-lg font-semibold tracking-wide text-white group-hover:text-white font-aldrich">
-            HISTORY
-          </span>
-        </div>
-      </button>
     </div>
-  )
-}
+  );
+};
 
-export default ADBPage
+export default ADBPage;

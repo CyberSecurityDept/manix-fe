@@ -1,13 +1,18 @@
-import React from 'react';
-import bgDarkmode from '../../assets/bg-darkmode.png';
-import Header from '../../components/Header';
-import Navbar from '../../components/NavBar';
-import plusSign from '../../assets/plus-sign.svg';
+import React from 'react'
+import { useNavigate } from 'react-router-dom'
+import bgDarkmode from '../../assets/bg-darkmode.png'
+import Header from '../../components/Header'
+import Navbar from '../../components/NavBar'
+import plusSign from '../../assets/plus-sign.svg'
+import DonutChart from '../../components/DonatChart'
+import bg_button from '../../assets/scan.svg'
 
 const CaseManagementDashboard = () => {
+  const navigate = useNavigate()
+
   return (
     <div
-      className="case-management-dashboard min-h-screen bg-cover bg-no-repeat bg-center"
+      className="case-management-dashboard min-h-screen bg-cover bg-no-repeat bg-center font-aldrich"
       style={{ backgroundImage: `url(${bgDarkmode})` }}
     >
       {/* Header Section */}
@@ -39,26 +44,29 @@ const CaseManagementDashboard = () => {
               <img
                 src={plusSign}
                 alt="Plus Sign"
-                className="absolute top-[-13px] left-[-12px] w-6 h-6"
+                className="absolute top-[-13px] left-[-13px] w-6 h-6"
               />
-              <span className="absolute top-2 left-10 font-bold">01</span>
+              <DonutChart />
             </div>
-            
-            <div className="relative w-[350px] h-[295px] border border-y-[#0C9A8D] border-x-[#05564F] bg-gradient-to-b from-[#091817] to-[#0C1612] text-white">
-              <span className="absolute top-2 left-10 font-bold">02</span>
+
+            <div className="shadow-inner relative w-[350px] h-[295px] border border-y-[#0C9A8D] border-x-[#05564F] bg-gradient-to-b from-[#091817] to-[#0C1612] text-white flex flex-col items-center justify-center ">
+              <span className="text-5xl font-bold">12</span>
+              <span className="text-4xl mt-1">Total Case</span>
             </div>
-            
-            <div className="relative w-[350px] h-[295px] border border-y-[#0C9A8D] border-x-[#05564F] bg-gradient-to-b from-[#091817] to-[#0C1612] text-white">
-              <span className="absolute top-2 left-10 font-bold">03</span>
+
+            <div className="relative w-[350px] h-[295px] border border-y-[#0C9A8D] border-x-[#05564F] bg-gradient-to-b from-[#091817] to-[#0C1612] text-white flex flex-col items-center justify-center">
+              <span className="text-5xl font-bold">12</span>
+              <span className="text-4xl mt-1">Total Case</span>
             </div>
-            
-            <div className="relative w-[350px] h-[295px] border border-y-[#0C9A8D] border-x-[#05564F] bg-gradient-to-b from-[#091817] to-[#0C1612] text-white">
+
+            <div className="shadow-inner relative w-[350px] h-[295px] border border-y-[#0C9A8D] border-x-[#05564F] bg-gradient-to-b from-[#091817] to-[#0C1612] text-white flex flex-col items-center justify-center">
               <img
                 src={plusSign}
                 alt="Plus Sign"
                 className="absolute bottom-[-12px] right-[-12px] w-6 h-6"
               />
-              <span className="absolute top-2 left-10 font-bold">04</span>
+              <span className="text-5xl font-bold">12</span>
+              <span className="text-4xl font-bold mt-1">Total Case</span>
             </div>
           </div>
 
@@ -69,19 +77,41 @@ const CaseManagementDashboard = () => {
           ></div>
 
           {/* Right Section */}
-          <div className="flex flex-col items-center space-y-4">
-            <div className="w-[350px] h-[295px] border border-y-[#0C9A8D] border-x-[#05564F] bg-gradient-to-b from-[#091817] to-[#0C1612]"></div>
-            <button className="w-[389px] h-[120px] border border-[#4FD1C5] bg-gradient-to-b from-[#091817] to-[#0C1612] text-white hover:bg-teal-600">
+          <div className="flex flex-col items-center space-y-8">
+            <div className="relative w-[350px] h-[295px] border border-y-[#0C9A8D] border-x-[#05564F] bg-gradient-to-b from-[#091817] to-[#0C1612]">
+              <img
+                src={plusSign}
+                alt="Plus Sign"
+                className="absolute top-[-13px] left-[-13px] w-6 h-6"
+              />
+              <img
+                src={plusSign}
+                alt="Plus Sign"
+                className="absolute bottom-[-12px] right-[-12px] w-6 h-6"
+              />
+            </div>
+            <button
+              className="w-[389px] h-[120px] border border-[#4FD1C5] bg-cover bg-center text-white hover:bg-teal-600"
+              style={{
+                backgroundImage: `url(${bg_button})`
+              }}
+              onClick={() => navigate('/add-device')}
+            >
               Add Device
             </button>
-            <button className="w-[389px] h-[120px] border border-[#4FD1C5] bg-gradient-to-b from-[#091817] to-[#0C1612] text-white hover:bg-teal-600">
+            <button
+              className="w-[389px] h-[120px] border border-[#4FD1C5] bg-cover bg-center text-white hover:bg-teal-600"
+              style={{
+                backgroundImage: `url(${bg_button})`
+              }}
+            >
               Add Case
             </button>
           </div>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default CaseManagementDashboard;
+export default CaseManagementDashboard

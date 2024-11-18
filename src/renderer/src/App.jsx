@@ -1,24 +1,25 @@
-import React from 'react';
-import HomePage from "./pages/HomePage";
-import SearchDevicePage from "./pages/SearchDevicePage";
-import DeviceInfoPage from "./pages/DeviceInfoPage";
-import ADBPage from "./pages/ADBPage";
-import { HashRouter as Router, Route, Routes } from 'react-router-dom';  
-import FastScanPage from './pages/FastScanPage';
-import ResultFastScanPage from './pages/ResultFastScanPage';
-import HistoryPage from './pages/HistoryPage';
-import CaseManagementDashboard from './pages/CaseManagement/Dashboard';
-import OTA from './pages/OtaPage';
-import UnderMaintenance from './pages/UnderMaintenance';
-import IframePage from './pages/IframePage';
+import React from 'react'
+import HomePage from './pages/HomePage'
+import SearchDevicePage from './pages/SearchDevicePage'
+import DeviceInfoPage from './pages/DeviceInfoPage'
+import ADBPage from './pages/ADBPage'
+import { HashRouter as Router, Route, Routes } from 'react-router-dom'
+import FastScanPage from './pages/FastScanPage'
+import ResultFastScanPage from './pages/ResultFastScanPage'
+import HistoryPage from './pages/HistoryPage'
+import CaseManagementDashboard from './pages/CaseManagement/Dashboard'
+import OTA from './pages/OtaPage'
+import UnderMaintenance from './pages/UnderMaintenance'
+import IframePage from './pages/IframePage'
+import AddDevicePage from './pages/CaseManagement/AddDevicePage'
 
 function App() {
   // Pastikan ipcHandle hanya dipanggil jika window.electron ada
   const ipcHandle = () => {
     if (window.electron) {
-      window.electron.ipcRenderer.send('ping');
+      window.electron.ipcRenderer.send('ping')
     } else {
-      console.error("IPC Renderer not found. Make sure preload.js is properly configured.");
+      console.error('IPC Renderer not found. Make sure preload.js is properly configured.')
     }
   }
 
@@ -56,10 +57,13 @@ function App() {
         <Route path="/history" element={<HistoryPage />} />
 
         {/* Route untuk halaman CaseManagementDashboard*/}
-        <Route path="/dashboard" element={<CaseManagementDashboard/>} />
+        <Route path="/dashboard" element={<CaseManagementDashboard />} />
+
+        {/* Route untuk halaman AddDevicePage */}
+        <Route path="/add-device" element={<AddDevicePage />} />
       </Routes>
     </Router>
-  );
+  )
 }
 
-export default App;
+export default App

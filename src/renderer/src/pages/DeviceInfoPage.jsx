@@ -1,70 +1,79 @@
-import React, { useState, useEffect } from 'react'
-import Skeleton from 'react-loading-skeleton'
-import 'react-loading-skeleton/dist/skeleton.css'
-import CreatableSelect from 'react-select/creatable'
-import { useNavigate, Link } from 'react-router-dom'
-import bgDarkmode from '../assets/bg-darkmode.png'
-import plusSign from '../assets/plus-sign.svg'
-import historyIcon from '../assets/history-icon.svg'
-import backIcon from '../assets/back-Icon.svg'
-import buttonScan from '../assets/Scan.svg'
+import React, { useState, useEffect, useRef } from 'react';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
+import CreatableSelect from 'react-select/creatable';
+import { useNavigate } from 'react-router-dom';
+import bgDarkmode from '../assets/bg-darkmode.png';
+import plusSign from '../assets/plus-sign.svg';
+import backIcon from '../assets/back-Icon.svg';
+import buttonScan from '../assets/Scan.svg';
 
 // Mengambil BASE_URL dari environment variables
-const BASE_URL = import.meta.env.VITE_BASE_URL
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const DeviceInfoPage = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // State untuk menyimpan data API
-  const [deviceData, setDeviceData] = useState(null)
+  const [deviceData, setDeviceData] = useState(null);
   const [nameOptions, setNameOptions] = useState([
     { value: 'John', label: 'John' },
     { value: 'Jane', label: 'Jane' },
     { value: 'Doe', label: 'Doe' }
-  ])
-  const [selectedName, setSelectedName] = useState(null) // State untuk menyimpan nama yang dipilih
-  const [loading, setLoading] = useState(true)
+  ]);
+  const [selectedName, setSelectedName] = useState(null); // State untuk menyimpan nama yang dipilih
+  const [loading, setLoading] = useState(true);
+
+  const hasFetchedData = useRef(false); // Menggunakan useRef untuk melacak apakah data sudah di-fetch
 
   // Fungsi untuk memanggil API saat komponen dimuat
   useEffect(() => {
-    fetch(`${BASE_URL}/v1/device-overview`)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log('Device Data:', data)
-        setDeviceData(data.data) // Simpan data device ke state
-        setNameOptions([{ value: data.data.name, label: data.data.name }]) // Set nama dari data API ke opsi
+    const fetchData = async () => {
+      if (hasFetchedData.current) return; // Cegah pemanggilan jika data sudah di-fetch
+
+      hasFetchedData.current = true; // Tandai bahwa data sudah di-fetch
+
+      try {
+        const response = await fetch(`${BASE_URL}/v1/device-overview`);
+        const data = await response.json();
+        console.log('Device Data:', data);
+        setDeviceData(data.data); // Simpan data device ke state
+        setNameOptions([{ value: data.data.name, label: data.data.name }]); 
         // Simpan serial number ke local storage
-        localStorage.setItem('serial_number', data.data.serial_number)
-        setLoading(false)
-      })
-      .catch((error) => {
-        console.error('Error fetching device data:', error)
-        setLoading(false) // Matikan loading jika ada error
-      })
-  }, [])
+        localStorage.setItem('serial_number', data.data.serial_number);
+
+        setLoading(false); // Set loading ke false setelah data berhasil diambil
+      } catch (error) {
+        console.error('Error fetching device data:', error);
+        setLoading(false); // Matikan loading jika ada error
+      }
+    };
+
+    fetchData();
+  }, []); // Hanya jalankan sekali saat komponen dipasang
 
   // Fungsi untuk menangani opsi baru yang dibuat
   const handleCreate = (inputValue) => {
-    const newOption = { value: inputValue, label: inputValue }
-    setNameOptions((prevOptions) => [...prevOptions, newOption])
-    setSelectedName(newOption)
-  }
+    const newOption = { value: inputValue, label: inputValue };
+    setNameOptions((prevOptions) => [...prevOptions, newOption]);
+    setSelectedName(newOption);
+  };
 
   // Fungsi untuk memanggil API saat tombol Fast Scan diklik
   const handleFastScan = () => {
     // Periksa apakah nama dan serial number ada
     if (!selectedName || !deviceData.serial_number) {
-      alert('Name or Serial Number is missing')
-      return
+      alert('Name or Serial Number is missing');
+      return;
     }
 
     // Buat request URL dengan serial_number dan name di dalam query string
-    const requestUrl = `${BASE_URL}/v1/fast-scan/${deviceData.serial_number}?name=${selectedName.value}`
-
+    const requestUrl = `${BASE_URL}/v1/fast-scan/${deviceData.serial_number}?name=${selectedName.value}`;
+    
     // Log untuk memeriksa URL sebelum dikirim ke API
-    console.log('Request URL:', requestUrl)
+    console.log('Request URL:', requestUrl);
 
-    // Panggil API fast-scan dengan POST method tanpa body (sesuai dengan cURL yang kamu berikan)
+    // Panggil API fast-scan dengan POST method tanpa body
     fetch(requestUrl, {
       method: 'POST',
       headers: {
@@ -73,13 +82,13 @@ const DeviceInfoPage = () => {
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
-        return response.json()
+        return response.json();
       })
       .then((data) => {
         // Log untuk melihat respons dari API
-        console.log('Fast Scan Response:', data)
+        console.log('Fast Scan Response:', data);
 
         // Periksa apakah fast scan berhasil
         if (
@@ -87,18 +96,18 @@ const DeviceInfoPage = () => {
           data.message === 'Fast scan started successfully in the background'
         ) {
           // Jika berhasil, pindah ke halaman fast-scan
-          navigate('/fast-scan')
+          navigate('/fast-scan');
         } else {
           // Jika gagal, tampilkan pesan error
-          console.error('Fast scan failed:', data)
-          alert('Failed to start fast scan. Please try again.')
+          console.error('Fast scan failed:', data);
+          alert('Failed to start fast scan. Please try again.');
         }
       })
       .catch((error) => {
         // Log jika terjadi error selama proses API call
-        console.error('Error during Fast Scan:', error)
-      })
-  }
+        console.error('Error during Fast Scan:', error);
+      });
+  };
 
   return (
     <div
@@ -127,7 +136,7 @@ const DeviceInfoPage = () => {
         <Skeleton
           width={801}
           baseColor="#0B0C0B"
-          highlightColor="#121214"
+          highlightColor="#064039"
           className="w-[801px] h-[480px]"
         />
       ) : (
@@ -263,41 +272,13 @@ const DeviceInfoPage = () => {
               </div>
             </div>
           </div>
-
-          <p className="mb-2">
-            Previous scan history found on this device.<br></br>
-            Would you like to view it?
-          </p>
-
-          <Link to="/history" className="text-[#4FD1C5] underline">
-            History
-          </Link>
         </div>
       )}
 
-      {/* Tombol History */}
-      <button
-        className="absolute top-6 right-6 flex items-center focus:outline-none group"
-        onClick={() => navigate('/history')}
-      >
-        {/* Lingkaran dengan Ikon */}
-        <div className="relative w-[53px] h-[53px] flex items-center justify-center rounded-full border-2 border-[#4FD1C5] bg-[#0B1E1E] shadow-lg -mr-4 z-10 group-hover:bg-teal-700 transition-all duration-300">
-          <img src={historyIcon} alt="History Icon" className="w-8 h-8" />
-        </div>
-
-        {/* Persegi Panjang dengan Teks */}
-        <div className="w-[134px] h-[40px] bg-[#0B1E1E] rounded-r-lg border-t-2 border-b-2 border-r-2 border-[#4FD1C5] shadow-lg flex items-center justify-center group-hover:bg-teal-700 transition-all duration-300">
-          <span className="text-lg font-semibold tracking-wide text-white group-hover:text-black font-aldrich">
-            HISTORY
-          </span>
-        </div>
-      </button>
-
       {/* Tombol Scan */}
-      {/* Fast Scan Button */}
       <div className="flex space-x-8 mt-6 font-aldrich">
         <button
-          className={`w-[389px] h-[120px] text-xl font-bold bg-transparent border border-teal-400 hover:bg-teal-700 rounded-md shadow-lg flex flex-col justify-center items-center relative ${
+          className={`w-[801px] h-[120px] text-xl font-bold bg-transparent border border-teal-400 hover:bg-teal-700 rounded-md shadow-lg flex flex-col justify-center items-center relative ${
             !selectedName ? 'cursor-not-allowed opacity-50' : ''
           }`}
           style={{
@@ -313,28 +294,9 @@ const DeviceInfoPage = () => {
           {/* Hover Overlay */}
           <div className="absolute inset-0 bg-teal-700 opacity-0 hover:opacity-30 transition-opacity"></div>
         </button>
-
-        {/* Full Scan Button */}
-        <button
-          className={`w-[389px] h-[120px] text-xl font-bold bg-transparent border border-teal-400 hover:bg-teal-700 rounded-md shadow-lg flex flex-col justify-center items-center relative ${
-            !selectedName ? 'cursor-not-allowed opacity-50' : ''
-          }`}
-          style={{
-            backgroundImage: `url(${buttonScan})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}
-          onClick={() => navigate('/maintenance')}
-          disabled={!selectedName}
-        >
-          FULL SCAN
-          <p className="text-sm mt-2">Perform a comprehensive security check of your device.</p>
-          {/* Hover Overlay */}
-          <div className="absolute inset-0 bg-teal-700 opacity-0 hover:opacity-30 transition-opacity"></div>
-        </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default DeviceInfoPage
+export default DeviceInfoPage;
