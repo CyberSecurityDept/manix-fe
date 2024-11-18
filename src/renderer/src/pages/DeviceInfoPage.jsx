@@ -136,7 +136,7 @@ const DeviceInfoPage = () => {
         <Skeleton
           width={801}
           baseColor="#0B0C0B"
-          highlightColor="#4E4B51"
+          highlightColor="#064039"
           className="w-[801px] h-[480px]"
         />
       ) : (
