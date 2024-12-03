@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'
 import backIcon from '../assets/chevronleft.svg';  
 import settingsIcon from '../assets/settings.svg'; 
 import ActiveButton from '../assets/button-aktif.svg'; 
@@ -6,13 +7,15 @@ import DeactiveButton from '../assets/navbar-nonaktif.svg';
 import Spotlight from '../assets/dashboard-spotlight.png';  
 
 const Navbar = () => {
+  const navigate = useNavigate()
+  
   // State untuk menentukan tombol yang aktif
   const [activeButton, setActiveButton] = useState('Dashboard');
 
   return (
     <div className="relative w-screen h-[10vh] flex items-center justify-between px-6 mt-[-180px] ">
       {/* Button Back */}
-      <button className="text-white flex items-center">
+      <button className="text-white flex items-center" onClick={() => navigate('/')}>
         <img src={backIcon} alt="Back" className="w-16 h-16" />
       </button>
 

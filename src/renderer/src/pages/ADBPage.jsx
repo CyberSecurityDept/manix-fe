@@ -15,9 +15,9 @@ const ADBPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (isFetchingRef.current) return; // Cegah pemanggilan jika sedang fetching
+      if (isFetchingRef.current) return; 
 
-      isFetchingRef.current = true; // Set fetching menjadi true
+      isFetchingRef.current = true; 
       try {
         // Gabungkan BASE_URL dengan ENDPOINT
         const response = await fetch(`${BASE_URL}${ENDPOINT}`);
@@ -29,24 +29,22 @@ const ADBPage = () => {
 
         // Cek kondisi is_cable_connected dan is_adb_connected
         if (is_cable_connected && is_adb_connected) {
-          // Pindah ke DeviceInfoPage jika kabel dan adb tersambung
           navigate('/device-info');
         } else if (!is_cable_connected && is_adb_connected) {
-          // Pindah ke SearchDevicePage jika kabel tersambung tapi adb tidak tersambung
           navigate('/search-device');
         }
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
-        isFetchingRef.current = false; // Reset fetching state
+        isFetchingRef.current = false; 
       }
     };
 
     fetchData(); // Panggilan pertama
-    const intervalId = setInterval(fetchData, 500); // Atur interval untuk memanggil fetchData setiap 500 milidetik
+    const intervalId = setInterval(fetchData, 500); 
 
     return () => {
-      clearInterval(intervalId); // Membersihkan interval saat komponen dibongkar
+      clearInterval(intervalId);
     };
   }, [navigate]);
 

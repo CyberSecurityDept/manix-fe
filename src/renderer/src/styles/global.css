@@ -19,8 +19,7 @@
 /* Custom Scrollbar */
 /* Scrollbar track (horizontal and vertical) */
 ::-webkit-scrollbar {
-  width: 10px;  /* Width for vertical scrollbar */
-  height: 10px; /* Height for horizontal scrollbar */
+  width: 8px;  /* Width for vertical scrollbar */
   background-color: #064039; /* Dark blue background for scrollbar track */
   border: none;
 }
@@ -28,17 +27,13 @@
 /* Scrollbar handle */
 ::-webkit-scrollbar-thumb {
   background-color: #00B3A2; /* Lighter blue for scrollbar handle */
-  /* Spacing around the handle */
+
 }
 
-/* For vertical scrollbar */
-::-webkit-scrollbar-thumb:vertical {
-  min-height: 30px; /* Minimum height for the handle */
-}
 
 /* Scrollbar buttons (if any, but note that not all browsers show them) */
 ::-webkit-scrollbar-button {
-  background-color: #064039; /* Dark blue background for buttons */
+  background-color: #064039;
 }
 
 
