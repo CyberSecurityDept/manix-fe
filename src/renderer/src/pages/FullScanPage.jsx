@@ -12,7 +12,7 @@ import buttonCancel from '../assets/border/cancel.svg'
 // Mengambil BASE_URL dari environment variables
 const BASE_URL = import.meta.env.VITE_BASE_URL
 
-const FastScanPage = () => {
+const FullScanPage = () => {
   const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -46,7 +46,7 @@ const FastScanPage = () => {
     const fetchScanProgress = async () => {
       if (!serialNumber) return // Tunggu sampai serialNumber tersedia
       try {
-        const response = await fetch(`${BASE_URL}/v1/scan-progress/${serialNumber}`)
+        const response = await fetch(`${BASE_URL}/v1/fullscan-progress/${serialNumber}`)
         const data = await response.json()
 
         if (data.status === 200) {
@@ -201,4 +201,4 @@ const FastScanPage = () => {
   )
 }
 
-export default FastScanPage
+export default FullScanPage

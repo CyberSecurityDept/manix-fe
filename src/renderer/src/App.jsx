@@ -1,27 +1,27 @@
-import React from 'react';
-import { HashRouter as Router, Route, Routes } from 'react-router-dom';  
-import SearchDevicePage from "./pages/SearchDevicePage";
-import DeviceInfoPage from "./pages/DeviceInfoPage";
-import ADBPage from "./pages/ADBPage";
-import FastScanPage from './pages/FastScanPage';
-import ResultFastScanPage from './pages/ResultFastScanPage';
-import UnderMaintenance from './pages/UnderMaintenance';
-import ResultPage from './pages/ResultPage';
+import React from 'react'
+import { HashRouter as Router, Route, Routes } from 'react-router-dom'
+import SearchDevicePage from './pages/SearchDevicePage'
+import DeviceInfoPage from './pages/DeviceInfoPage'
+import ADBPage from './pages/ADBPage'
+import FastScanPage from './pages/FastScanPage'
+import ResultFastScanPage from './pages/ResultFastScanPage'
+import UnderMaintenance from './pages/UnderMaintenance'
+import ResultPage from './pages/ResultPage'
+import FullScanPage from './pages/FullScanPage'
 
 function App() {
   // Pastikan ipcHandle hanya dipanggil jika window.electron ada
   const ipcHandle = () => {
     if (window.electron) {
-      window.electron.ipcRenderer.send('ping');
+      window.electron.ipcRenderer.send('ping')
     } else {
-      console.error("IPC Renderer not found. Make sure preload.js is properly configured.");
+      console.error('IPC Renderer not found. Make sure preload.js is properly configured.')
     }
   }
 
   return (
     <Router>
       <Routes>
-
         {/* Route untuk halaman SearchDevicePage */}
         <Route path="/" element={<SearchDevicePage />} />
 
@@ -43,9 +43,11 @@ function App() {
         {/* Route untuk halaman ResultPage */}
         <Route path="/result" element={<ResultPage />} />
 
+        {/* Route untuk halaman FullScanPage */}
+        <Route path="/full-scan" element={<FullScanPage />} />
       </Routes>
     </Router>
-  );
+  )
 }
 
-export default App;
+export default App
