@@ -222,7 +222,7 @@ const DeviceInfoPage = () => {
           >
             {/* Gambar Device */}
             <div className="flex justify-center p-4">
-              <div className="p-2 rounded-lg w-[187px] h-[187px]">
+              <div className="p-2 rounded-lg w-[200px] h-[200px]">
                 {/* Skeleton jika loading */}
                 {loading ? (
                   <Skeleton className="w-full h-full" />
@@ -230,7 +230,7 @@ const DeviceInfoPage = () => {
                   <img
                     src={deviceData?.image}
                     alt="Device"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                   />
                 )}
               </div>
