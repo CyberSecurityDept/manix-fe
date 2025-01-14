@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import '../styles/Checkbox.css'
 import { Link } from 'react-router-dom'
 import bgImage from '../assets/bg-darkmode.png'
@@ -130,7 +130,6 @@ const ResultFastScanPage = () => {
         backgroundPosition: 'center'
       }}
     >
-
       {/* Security Percentage Section */}
       <div className="flex flex-col items-center justify-center space-y-2 mt-2 relative">
         <div>

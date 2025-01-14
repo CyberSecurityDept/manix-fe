@@ -13,10 +13,10 @@ import noMalwareImage from '../assets/no-malware3.jpg'
 // Mengambil BASE_URL dari environment variables
 const BASE_URL = import.meta.env.VITE_BASE_URL
 const DEVICE_INFO_ENDPOINT = '/v1/simplify-get-info'
-const ACTIVITIES_ENDPOINT = '/v1/activities'
+const FULLSCAN_ACTIVITIES_ENDPOINT = '/v1/fullscan-activities'
 const DELETE_MALWARE_ENDPOINT = '/v1/delete-malware'
 
-const ResultPage = () => {
+const ResultFullScanPage = () => {
   // State for modals
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false)
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false)
@@ -47,9 +47,9 @@ const ResultPage = () => {
       }
     }
 
-    const fetchActivities = async () => {
+    const fetchFullScanActivities = async () => {
       try {
-        const response = await fetch(`${BASE_URL}${ACTIVITIES_ENDPOINT}`)
+        const response = await fetch(`${BASE_URL}${FULLSCAN_ACTIVITIES_ENDPOINT}`)
         const data = await response.json()
         if (data.status === 'success') {
           // Pastikan data.data adalah array
@@ -60,11 +60,11 @@ const ResultPage = () => {
             setActivities([]) // Set to empty array if data is not an array
           }
         } else {
-          console.error('Failed to fetch activities:', data.message)
+          console.error('Failed to fetch fullscan activities:', data.message)
           setActivities([]) // Set to empty array on failure
         }
       } catch (error) {
-        console.error('Error fetching activities:', error)
+        console.error('Error fetching fullscan activities:', error)
         setActivities([]) // Set to empty array on error
       } finally {
         setLoading(false) // Set loading to false
@@ -72,7 +72,7 @@ const ResultPage = () => {
     }
 
     fetchDeviceInfo()
-    fetchActivities()
+    fetchFullScanActivities()
   }, []) // Run once on mount
 
   // Open modal functions
@@ -110,7 +110,7 @@ const ResultPage = () => {
       className="h-screen w-screen flex flex-col justify-center items-center relative font-aldrich"
       style={{ backgroundImage: `url(${bgImage})`, backgroundSize: 'cover' }}
     >
-      <h2 className="text-4xl font-bold text-white mb-8">Result</h2>
+      <h2 className="text-4xl font-bold text-white mb-8">Result Full Scan</h2>
 
       {/* Card Container */}
       <div className="relative w-[1001px] mb-4">
@@ -246,4 +246,4 @@ const ResultPage = () => {
   )
 }
 
-export default ResultPage
+export default ResultFullScanPage

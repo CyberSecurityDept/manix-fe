@@ -8,6 +8,7 @@ import ResultFastScanPage from './pages/ResultFastScanPage'
 import UnderMaintenance from './pages/UnderMaintenance'
 import ResultPage from './pages/ResultPage'
 import FullScanPage from './pages/FullScanPage'
+import ResultFullScanPage from './pages/ResultFullScanPage'
 
 function App() {
   // Pastikan ipcHandle hanya dipanggil jika window.electron ada
@@ -45,6 +46,9 @@ function App() {
 
         {/* Route untuk halaman FullScanPage */}
         <Route path="/full-scan" element={<FullScanPage />} />
+
+        {/* Route untuk halaman ResultFullScanPage */}
+        <Route path="/result-full-scan" element={<ResultFullScanPage />} />
       </Routes>
     </Router>
   )

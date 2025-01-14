@@ -17,11 +17,7 @@ const DeviceInfoPage = () => {
 
   // State untuk menyimpan data API
   const [deviceData, setDeviceData] = useState(null)
-  const [nameOptions, setNameOptions] = useState([
-    { value: 'John', label: 'John' },
-    { value: 'Jane', label: 'Jane' },
-    { value: 'Doe', label: 'Doe' }
-  ])
+  const [nameOptions, setNameOptions] = useState()
   const [selectedName, setSelectedName] = useState(null) // State untuk menyimpan nama yang dipilih
   const [loading, setLoading] = useState(true)
 
@@ -63,7 +59,7 @@ const DeviceInfoPage = () => {
   // Fungsi untuk memanggil API saat tombol Fast Scan diklik
   const handleFastScan = () => {
     // Periksa apakah nama dan serial number ada
-    if (!selectedName || !deviceData.serial_number) {
+    if (!selectedName || !selectedName.value || !deviceData.serial_number) {
       alert('Name or Serial Number is missing')
       return
     }
@@ -112,7 +108,7 @@ const DeviceInfoPage = () => {
 
   const handleFullScan = () => {
     // Periksa apakah nama dan serial number ada
-    if (!selectedName || !deviceData.serial_number) {
+    if (!selectedName || !selectedName.value || !deviceData.serial_number) {
       alert('Name or Serial Number is missing')
       return
     }
@@ -216,12 +212,12 @@ const DeviceInfoPage = () => {
 
           {/* Detail Device Section */}
           <div
-            className="w-[740px] h-[300px] flex items-center justify-start mb-[21px] p-4 "
+            className="w-[740px] h-[300px] flex items-center justify-start mb-[21px] p-4 border border-y-[#0C9A8D] border-x-[#05564F] "
             style={{
               backgroundColor: 'rgba(0, 0, 0, 0.3)',
               boxShadow:
-                '0px -9px 0px -7px rgba(4, 209, 197, 0.5), 0px 11px 0px -9px rgba(4, 209, 197, 0.5)',
-              border: '1px solid transparent'
+                '0px -9px 0px -7px rgba(4, 209, 197, 0.5), 0px 11px 0px -9px rgba(4, 209, 197, 0.5)'
+              // border: '1px solid transparent'
             }}
           >
             {/* Gambar Device */}
