@@ -9,6 +9,8 @@ import UnderMaintenance from './pages/UnderMaintenance'
 import ResultPage from './pages/ResultPage'
 import FullScanPage from './pages/FullScanPage'
 import ResultFullScanPage from './pages/ResultFullScanPage'
+import OTA from './pages/OtaPage'
+import InformationPage from './pages/InformationPage'
 
 function App() {
   // Pastikan ipcHandle hanya dipanggil jika window.electron ada
@@ -49,6 +51,12 @@ function App() {
 
         {/* Route untuk halaman ResultFullScanPage */}
         <Route path="/result-full-scan" element={<ResultFullScanPage />} />
+
+        {/* Route untuk halaman OTA */}
+        <Route path="/ota" element={<OTA />} />
+
+        {/* Route untuk halaman Information */}
+        <Route path="/info" element={<InformationPage />} />
       </Routes>
     </Router>
   )

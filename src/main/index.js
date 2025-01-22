@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, autoUpdater, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -14,15 +14,15 @@ function createWindow() {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: true, 
+      sandbox: true,
       webviewTag: true, // Mengizinkan penggunaan webview
       webSecurity: false,
       fullscreen: true,
     }
   })
 
-   // Set Content Security Policy
-   mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+  // Set Content Security Policy
+  mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
     callback({
       responseHeaders: {
         ...details.responseHeaders,
@@ -96,5 +96,32 @@ app.on('window-all-closed', () => {
   }
 })
 
+// const server = 'http://localhost:8080'
+// const url = `${server}/update/${process.platform}/${app.getVersion()}`
+
+// autoUpdater.setFeedURL({ url })
+
+// setInterval(() => {
+//   autoUpdater.checkForUpdates()
+// }, 5000)
+
+// autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+//   const dialogOpts = {
+//     type: 'info',
+//     buttons: ['Restart', 'Later'],
+//     title: 'Application Update',
+//     message: process.platform === 'win32' ? releaseNotes : releaseName,
+//     detail: 'A new version has been downloaded. Restart the application to apply the updates.'
+//   }
+
+//   dialog.showMessageBox(dialogOpts).then((returnValue) => {
+//     if (returnValue.response === 0) autoUpdater.quitAndInstall()
+//   })
+// })
+
+// autoUpdater.on('error', (message) => {
+//   console.error('There was a problem updating the application')
+//   console.error(message)
+// })
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.

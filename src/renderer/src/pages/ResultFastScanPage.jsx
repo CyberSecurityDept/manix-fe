@@ -3,6 +3,7 @@ import '../styles/Checkbox.css'
 import { Link } from 'react-router-dom'
 import bgImage from '../assets/bg-darkmode.png'
 import RemoveModal from '../components/modal/Delete'
+import RiskModal from '../components/modal/Risk'
 import CompleteModal from '../components/modal/Complete'
 import AfterCompleteModal from '../components/modal/AfterComplete'
 import DeleteProgressModal from '../components/modal/DeleteProgress'
@@ -21,6 +22,10 @@ import plusSign from '../assets/plus-sign.svg'
 const ResultFastScanPage = () => {
   // State for Remove Modal
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false)
+
+  // State for Risk Modal
+  const [isRiskModalOpen, setIsRiskModalOpen] = useState(false)
+  const [selectedRiskData, setSelectedRiskData] = useState(null)
 
   // State for Complete Scan Modal
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false)
@@ -43,6 +48,30 @@ const ResultFastScanPage = () => {
   // Handlers for Remove Modal
   const openRemoveModal = () => setIsRemoveModalOpen(true)
   const closeRemoveModal = () => setIsRemoveModalOpen(false)
+
+  const openRiskModal = (risk) => {
+    // Simulasikan data risiko berdasarkan nilai risk
+    const riskData = {
+      risk: risk, // Gunakan nilai risk dari item
+      maliciousCount: 5, // Contoh data
+      commonCount: 16, // Contoh data
+      details: [
+        {
+          title: 'Android.permission.INTERNET',
+          description:
+            'Malware can send your personal data to external servers without your knowledge.'
+        }
+        // Tambahkan detail lainnya
+      ]
+    }
+    setSelectedRiskData(riskData) // Simpan data risiko
+    setIsRiskModalOpen(true) // Buka modal
+  }
+
+  const closeRiskModal = () => {
+    setIsRiskModalOpen(false) // Tutup modal
+    setSelectedRiskData(null) // Bersihkan data risiko
+  }
 
   // Fungsi untuk buka Complete Scan Modal
   const openCompleteModal = () => setIsCompleteModalOpen(true)
@@ -113,6 +142,36 @@ const ResultFastScanPage = () => {
   const handleProgressComplete = () => {
     setIsProgressModalOpen(false)
     setBeforePercentage(lastScanPercentage)
+  }
+
+  // State untuk menyimpan data items
+  const [items, setItems] = useState([
+    { id: 1, date: '2024-07-05', name: 'msexcel.exe', risk: '80%', selected: false },
+    { id: 2, date: '2024-07-06', name: 'msoffice.exe', risk: '80%', selected: false },
+    { id: 3, date: '2024-07-09', name: 'msoffice.exe', risk: '80%', selected: false },
+    { id: 4, date: '2024-07-20', name: 'msexcel.exe', risk: '80%', selected: false }
+  ])
+
+  // State untuk sorting
+  const [sortConfig, setSortConfig] = useState({
+    key: null,
+    direction: 'ascending'
+  })
+
+  // Fungsi untuk sorting
+  const handleSort = (key) => {
+    let direction = 'ascending'
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending'
+    }
+    setSortConfig({ key, direction })
+
+    const sortedItems = [...items].sort((a, b) => {
+      if (a[key] < b[key]) return direction === 'ascending' ? -1 : 1
+      if (a[key] > b[key]) return direction === 'ascending' ? 1 : -1
+      return 0
+    })
+    setItems(sortedItems)
   }
 
   useEffect(() => {
@@ -225,7 +284,7 @@ const ResultFastScanPage = () => {
 
             <div className="col-span-4 space-y-4 p-6">
               <div className="grid grid-cols-3 gap-4 items-center">
-                <span className="font-medium text-gray-400">Application</span>
+                <span className="font-medium text-[#E6FFFD]">Application</span>
                 <span className="text-gray-100">:</span>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-100">
@@ -242,7 +301,7 @@ const ResultFastScanPage = () => {
               </div>
 
               <div className="grid grid-cols-3 gap-4 items-center">
-                <span className="font-medium text-gray-400">Document</span>
+                <span className="font-medium text-[#E6FFFD]">Document</span>
                 <span className="text-gray-100">:</span>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-100">
@@ -259,7 +318,7 @@ const ResultFastScanPage = () => {
               </div>
 
               <div className="grid grid-cols-3 gap-4 items-center">
-                <span className="font-medium text-gray-400">Accessibility</span>
+                <span className="font-medium text-[#E6FFFD]">Accessibility</span>
                 <span className="text-gray-100">:</span>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-100">32</span>
@@ -273,7 +332,7 @@ const ResultFastScanPage = () => {
               </div>
 
               <div className="grid grid-cols-3 gap-4 items-center">
-                <span className="font-medium text-gray-400">Installer</span>
+                <span className="font-medium text-[#E6FFFD]">Installer</span>
                 <span className="text-gray-100">:</span>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-100">32</span>
@@ -289,14 +348,14 @@ const ResultFastScanPage = () => {
               <div className="border-b border-gray-400 my-4"></div>
 
               <div className="flex justify-between items-center">
-                <span className="font-medium text-gray-400">Threat</span>
+                <span className="font-medium text-[#E6FFFD]">Threat</span>
                 <span className="text-red-500 font-bold animate-blink bg-slate-600">43 Threat</span>
               </div>
             </div>
           </div>
 
           <div className="mt-16 text-center">
-            <p className="text-gray-400">
+            <p className="text-[#E6FFFD]">
               Previous scan history found on this device. Would you like to view{' '}
               <Link to="/history" className="text-teal-400 underline">
                 History
@@ -319,7 +378,7 @@ const ResultFastScanPage = () => {
             <h3 className="text-2xl font-semibold mb-10">Overview</h3>
             <div className="space-y-10">
               <div className="flex justify-between items-center">
-                <span className="text-gray-400">Application :</span>
+                <span className="text-[#E6FFFD]">Application :</span>
                 <div className="flex items-center">
                   <span className="text-gray-100">1/83</span>
                   <button
@@ -334,7 +393,7 @@ const ResultFastScanPage = () => {
                 </div>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-400">Document :</span>
+                <span className="text-[#E6FFFD]">Document :</span>
                 <div className="flex items-center">
                   <span className="text-gray-100">0/23051</span>
                   <button
@@ -349,7 +408,7 @@ const ResultFastScanPage = () => {
                 </div>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-400">Accessibility :</span>
+                <span className="text-[#E6FFFD]">Accessibility :</span>
                 <div className="flex items-center">
                   <span className="text-gray-100">1/83</span>
                   <button
@@ -364,7 +423,7 @@ const ResultFastScanPage = () => {
                 </div>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-400">Installer :</span>
+                <span className="text-[#E6FFFD]">Installer :</span>
                 <div className="flex items-center">
                   <span className="text-gray-100">1/83</span>
                   <button
@@ -379,7 +438,7 @@ const ResultFastScanPage = () => {
                 </div>
               </div>
               <div className="flex justify-between items-center mt-4 border-t border-gray-700 pt-4">
-                <span className="text-gray-400">Threat :</span>
+                <span className="text-[#E6FFFD]">Threat :</span>
                 <span className="text-gray-100">0/20581</span>
               </div>
             </div>
@@ -396,10 +455,20 @@ const ResultFastScanPage = () => {
             }}
           >
             <h3 className="text-2xl font-semibold mb-4">{selectedView || 'View'}</h3>
-            <div className="grid grid-cols-3 bg-[#00B3A2] p-2 text-black font-semibold mb-2">
-              <span className="text-start">Date Time</span>
-              <span className="text-center">Name</span>
-              <div className="flex items-end justify-end">
+            <div className="w-full bg-[#00B3A2] grid grid-cols-12 p-2 items-center text-sm text-black">
+              <div
+                className="col-span-5 flex items-center gap-1 cursor-pointer"
+                onClick={() => handleSort('date')}
+              >
+                Date Time <span>↓</span>
+              </div>
+              <div
+                className="col-span-5 flex items-center gap-1 cursor-pointer"
+                onClick={() => handleSort('name')}
+              >
+                Name <span>↓</span>
+              </div>
+              <div className="col-span-2 flex justify-end">
                 {/* Checkbox for select all */}
                 <label className="checkbox-container">
                   <input
@@ -412,25 +481,29 @@ const ResultFastScanPage = () => {
                 </label>
               </div>
             </div>
-
-            <div className="space-y-1">
-              {[...Array(5)].map((_, index) => (
+            <div className="space-y-[1px]">
+              {items.map((item) => (
                 <div
-                  key={index}
-                  className="grid grid-cols-3 border-b border-[#EAECF0] p-2 text-white"
+                  key={item.id}
+                  className="w-full grid grid-cols-12 p-2 items-center border-b border-[#1A1A1A] text-white"
                 >
-                  <span>2024-07-06</span>
-                  <div className="flex justify-center items-center">
-                    <span>msoffice.exe</span>
-                  </div>
-                  <div className="flex items-end justify-end">
-                    {/* Checkbox at table */}
+                  <div className="col-span-4">{item.date}</div>
+                  <div className="flex items-center col-span-8 justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="">{item.name}</span>
+                      <span
+                        className="bg-[#064039] px-3 py-1 rounded text-white cursor-pointer"
+                        onClick={() => openRiskModal(item.risk)}
+                      >
+                        Risk: {item.risk}
+                      </span>
+                    </div>
                     <label className="checkbox-container">
                       <input
                         type="checkbox"
                         className="custom-checkbox"
-                        checked={checkedItems[index]}
-                        onChange={() => handleCheckboxChange(index)}
+                        checked={checkedItems[item.id]}
+                        onChange={() => handleCheckboxChange(item.id)}
                       />
                       <span className="checkmark"></span>
                     </label>
@@ -438,9 +511,7 @@ const ResultFastScanPage = () => {
                 </div>
               ))}
             </div>
-
             <div className="border-b border-gray-400 mt-7 mb-5"></div>
-
             <div className="text-right mb-3">
               <button
                 className="w-[267px] h-[43px] bg-transparent text-white font-bold relative overflow-hidden"
@@ -455,7 +526,6 @@ const ResultFastScanPage = () => {
                 <div className="absolute inset-0 bg-red-900 opacity-0 hover:opacity-30 transition-opacity"></div>
               </button>
             </div>
-
             {/* Remove Modal */}
             {isRemoveModalOpen && (
               <RemoveModal
@@ -464,7 +534,6 @@ const ResultFastScanPage = () => {
                 onProgressComplete={handleProgressComplete}
               />
             )}
-
             {/* Modal untuk Progress Hapus */}
             {isProgressModalOpen && (
               <DeleteProgressModal
@@ -472,6 +541,12 @@ const ResultFastScanPage = () => {
                 onProgressComplete={handleProgressComplete} // Pastikan ini adalah fungsi dan diteruskan dengan benar
               />
             )}
+            {/* Risk Modal */}
+            <RiskModal
+              isOpen={isRiskModalOpen}
+              onClose={closeRiskModal}
+              riskData={selectedRiskData}
+            />{' '}
           </div>
         </div>
       )}

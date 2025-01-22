@@ -16,3 +16,10 @@
     animation: progressAnimation 2s linear infinite;
   }
   
+.gradient-1 {
+  background-image: linear-gradient(to left, rgba(5, 199, 180, 0.25),rgba(255,0,0,0));
+}
+
+.gradient-custom {
+  background: linear-gradient(270deg, rgba(5, 199, 180, 0.5) 0%, rgba(1, 92, 84, 0.05) 28%);
+}

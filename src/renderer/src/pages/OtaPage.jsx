@@ -1,19 +1,103 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import bgDarkmode from '../assets/bg-darkmode.png'
 import plusSign from '../assets/plus-sign.svg'
 import Border from '../assets/border/App-border.svg'
 import UpdateBorder from '../assets/border/update.svg'
 import UpdateModal from '../components/modal/Update'
+import NewVersionModal from '../components/modal/NewVersion'
+import UpdateProgress from '../components/modal/UpdateProgress' // Import UpdateProgress modal
+import backIcon from '../assets/back-Icon.svg'
 
 const OTA = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const BASE_URL = import.meta.env.VITE_BASE_URL
+  const UPDATE_URL = '/v1/update-version'
+  const CHECK_URL = '/v1/check-update'
 
-  const openModal = () => {
-    setIsModalOpen(true)
+  const navigate = useNavigate()
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false)
+  const [isNewVersionModalOpen, setIsNewVersionModalOpen] = useState(false)
+  const [isUpdateProgressModalOpen, setIsUpdateProgressModalOpen] = useState(false) // State untuk UpdateProgress modal
+  const [updateData, setUpdateData] = useState(null)
+
+  const checkUpdate = async () => {
+    try {
+      setIsUpdateModalOpen(true) // Buka UpdateModal
+      const url = `${BASE_URL}${CHECK_URL}`
+      console.log('Fetching data from:', url)
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      })
+
+      console.log('Response status:', response.status)
+
+      if (!response.ok) {
+        throw new Error(`Network response was not ok. Status: ${response.status}`)
+      }
+
+      const data = await response.json()
+      console.log('Update data:', data)
+      setUpdateData(data)
+
+      // Jika ada versi baru, tampilkan NewVersionModal
+      if (data.current_tag !== data.latest_remote_tag) {
+        setIsUpdateModalOpen(false)
+        setIsNewVersionModalOpen(true)
+      } else {
+        setIsUpdateModalOpen(false)
+        alert('You are using the latest version.')
+      }
+    } catch (error) {
+      console.error('Error fetching update data:', error)
+      setIsUpdateModalOpen(false)
+      alert(`Failed to check for updates. Error: ${error.message}`)
+    }
   }
 
-  const closeModal = () => {
-    setIsModalOpen(false)
+  const handleUpdate = async () => {
+    setIsNewVersionModalOpen(false) // Tutup NewVersionModal
+    setIsUpdateProgressModalOpen(true) // Tampilkan UpdateProgress modal
+
+    try {
+      const url = `${BASE_URL}${UPDATE_URL}`
+      console.log('Updating to latest version:', url)
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      })
+
+      console.log('Response status:', response.status)
+
+      if (!response.ok) {
+        throw new Error(`Network response was not ok. Status: ${response.status}`)
+      }
+
+      const data = await response.json()
+      console.log('Update response:', data)
+
+      // Tampilkan pesan sukses berdasarkan respons
+      if (data.status === 'success') {
+        alert(data.message) // Tampilkan pesan sukses
+      } else {
+        throw new Error(data.message || 'Update failed')
+      }
+    } catch (error) {
+      console.error('Error updating version:', error)
+      alert(`Failed to update. Error: ${error.message}`)
+    } finally {
+      setIsUpdateProgressModalOpen(false) // Tutup UpdateProgress modal setelah selesai
+    }
   }
 
   return (
@@ -21,6 +105,11 @@ const OTA = () => {
       className="w-full h-screen relative bg-cover flex flex-col items-center justify-center"
       style={{ backgroundImage: `url(${bgDarkmode})` }}
     >
+      {/* Tombol Back */}
+      <button className="absolute top-6 left-6" onClick={() => navigate('/')}>
+        <img src={backIcon} alt="Back Icon" className="w-[48px] h-[48px]" />
+      </button>
+
       <h1 className="text-white text-3xl font-semibold mb-10">OTA</h1>
 
       {/* APP & CYBER Section */}
@@ -40,7 +129,7 @@ const OTA = () => {
         >
           <h2 className="text-white text-lg mb-2">APP V1.1.1.2</h2>
           <button
-            onClick={openModal}
+            onClick={checkUpdate}
             className="text-white py-1 px-4"
             style={{
               backgroundImage: `url(${UpdateBorder})`,
@@ -63,7 +152,7 @@ const OTA = () => {
         >
           <h2 className="text-white text-lg mb-2">CYBER V1.2.3.4</h2>
           <button
-            onClick={openModal}
+            onClick={checkUpdate}
             className="text-white py-1 px-4"
             style={{
               backgroundImage: `url(${UpdateBorder})`,
@@ -117,8 +206,33 @@ const OTA = () => {
           ))}
         </div>
       </div>
+
       {/* Update Modal */}
-      {isModalOpen && <UpdateModal onClose={closeModal} />}
+      {isUpdateModalOpen && (
+        <UpdateModal onClose={() => setIsUpdateModalOpen(false)} updateData={updateData} />
+      )}
+
+      {/* New Version Modal */}
+      {isNewVersionModalOpen && (
+        <NewVersionModal
+          onClose={() => setIsNewVersionModalOpen(false)}
+          onUpdate={handleUpdate}
+          updateData={updateData}
+        />
+      )}
+
+      {/* Update Progress Modal */}
+      {isUpdateProgressModalOpen && (
+        <UpdateProgress onClose={() => setIsUpdateProgressModalOpen(false)} />
+      )}
+
+      {/* OTA Button */}
+      <button
+        className="absolute bottom-[42px] right-[52px] flex items-center justify-center w-[60px] h-[60px] bg-gradient-to-b from-[#0C1612] to-[#091817] border-t border-b border-[#4FD1C5] text-sm font-bold text-white border hover:bg-teal-700 font-roboto"
+        onClick={() => navigate('/info')}
+      >
+        <span className="text-2xl">i</span>
+      </button>
     </div>
   )
 }
