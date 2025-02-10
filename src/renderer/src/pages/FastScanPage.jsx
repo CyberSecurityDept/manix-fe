@@ -46,7 +46,7 @@ const FastScanPage = () => {
     const fetchScanProgress = async () => {
       if (!serialNumber) return // Tunggu sampai serialNumber tersedia
       try {
-        const response = await fetch(`${BASE_URL}/v1/scan-progress/${serialNumber}`)
+        const response = await fetch(`${BASE_URL}/v1/fastscan-progress/${serialNumber}`)
         const data = await response.json()
 
         if (data.status === 200) {
