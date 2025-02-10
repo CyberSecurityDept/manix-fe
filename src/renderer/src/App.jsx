@@ -6,11 +6,13 @@ import ADBPage from './pages/ADBPage'
 import FastScanPage from './pages/FastScanPage'
 import ResultFastScanPage from './pages/ResultFastScanPage'
 import UnderMaintenance from './pages/UnderMaintenance'
-import ResultPage from './pages/ResultPage'
+import ResultFastPage from './pages/ResultFastPage'
 import FullScanPage from './pages/FullScanPage'
 import ResultFullScanPage from './pages/ResultFullScanPage'
 import OTA from './pages/OtaPage'
 import InformationPage from './pages/InformationPage'
+import HistoryPage from './pages/HistoryPage'
+import ResultFullPage from './pages/ResultFullPage'
 
 function App() {
   // Pastikan ipcHandle hanya dipanggil jika window.electron ada
@@ -43,14 +45,20 @@ function App() {
         {/* Route untuk halaman ResultFastScanPage */}
         <Route path="/result-fast-scan" element={<ResultFastScanPage />} />
 
-        {/* Route untuk halaman ResultPage */}
-        <Route path="/result" element={<ResultPage />} />
+        {/* Route untuk halaman ResultFastPage */}
+        <Route path="/result-fast" element={<ResultFastPage />} />
+
+        {/* Route untuk halaman ResultFullPage */}
+        <Route path="/result-full" element={<ResultFullPage />} />
 
         {/* Route untuk halaman FullScanPage */}
         <Route path="/full-scan" element={<FullScanPage />} />
 
         {/* Route untuk halaman ResultFullScanPage */}
         <Route path="/result-full-scan" element={<ResultFullScanPage />} />
+
+        {/* Route untuk halaman ResultFullScanPage */}
+        <Route path="/history" element={<HistoryPage />} />
 
         {/* Route untuk halaman OTA */}
         <Route path="/ota" element={<OTA />} />

@@ -17,7 +17,7 @@ const OTA = () => {
   const navigate = useNavigate()
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false)
   const [isNewVersionModalOpen, setIsNewVersionModalOpen] = useState(false)
-  const [isUpdateProgressModalOpen, setIsUpdateProgressModalOpen] = useState(false) // State untuk UpdateProgress modal
+  const [isUpdateProgressModalOpen, setIsUpdateProgressModalOpen] = useState(false)
   const [updateData, setUpdateData] = useState(null)
 
   const checkUpdate = async () => {
@@ -181,7 +181,7 @@ const OTA = () => {
 
         {/* Header and View More Button */}
         <div className="flex justify-between items-center px-10 py-4 border-b border-[#05564F]">
-          <h3 className="text-white text-xl font-semibold">Update Log</h3>
+          <h3 className="text-white text-xl font-semibold">Version Release</h3>
           <button className="bg-transparent border border-[#0C9A8D] text-[#FFFFFF] py-1 px-4 rounded hover:border-[#00FFE7]">
             VIEW MORE
           </button>

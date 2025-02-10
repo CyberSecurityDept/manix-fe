@@ -102,7 +102,7 @@ const RiskModal = ({ isOpen, onClose }) => {
                   activeButton === 'malicious'
                     ? {
                         backgroundImage: `url(${ButtonImage})`,
-                        backgroundSize: 'cover',
+                        backgroundSize: 'contain',
                         backgroundRepeat: 'no-repeat',
                         backgroundPosition: 'center'
                       }

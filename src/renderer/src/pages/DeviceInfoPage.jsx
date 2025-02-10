@@ -8,6 +8,7 @@ import bgDarkmode from '../assets/bg-darkmode.png'
 import plusSign from '../assets/plus-sign.svg'
 import backIcon from '../assets/back-Icon.svg'
 import buttonScan from '../assets/Scan.svg'
+import historyIcon from '../assets/history-icon.svg'
 
 // Mengambil BASE_URL dari environment variables
 const BASE_URL = import.meta.env.VITE_BASE_URL
@@ -320,6 +321,24 @@ const DeviceInfoPage = () => {
           </div>
         </div>
       )}
+
+      {/* Tombol History */}
+      <button
+        className="absolute top-6 right-6 flex items-center focus:outline-none group"
+        onClick={() => navigate('/history')}
+      >
+        {/* Lingkaran dengan Ikon */}
+        <div className="relative w-[53px] h-[53px] flex items-center justify-center rounded-full border-2 border-[#4FD1C5] bg-[#0B1E1E] shadow-lg -mr-4 z-10 group-hover:bg-teal-700 transition-all duration-300">
+          <img src={historyIcon} alt="History Icon" className="w-8 h-8" />
+        </div>
+
+        {/* Persegi Panjang dengan Teks */}
+        <div className="w-[134px] h-[40px] bg-[#0B1E1E] rounded-r-lg border-t-2 border-b-2 border-r-2 border-[#4FD1C5] shadow-lg flex items-center justify-center group-hover:bg-teal-700 transition-all duration-300">
+          <span className="text-lg font-semibold tracking-wide text-white group-hover:text-black font-aldrich">
+            HISTORY
+          </span>
+        </div>
+      </button>
 
       {/* Tombol Scan */}
       <div className="flex space-x-8 mt-6 font-aldrich">

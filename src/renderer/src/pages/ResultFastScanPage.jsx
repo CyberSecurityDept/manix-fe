@@ -481,29 +481,24 @@ const ResultFastScanPage = () => {
                 </label>
               </div>
             </div>
-            <div className="space-y-[1px]">
-              {items.map((item) => (
+            <div className="space-y-1">
+              {[...Array(5)].map((_, index) => (
                 <div
-                  key={item.id}
-                  className="w-full grid grid-cols-12 p-2 items-center border-b border-[#1A1A1A] text-white"
+                  key={index}
+                  className="grid grid-cols-3 border-b border-[#EAECF0] p-2 text-white"
                 >
-                  <div className="col-span-4">{item.date}</div>
-                  <div className="flex items-center col-span-8 justify-between">
-                    <div className="flex items-center gap-4">
-                      <span className="">{item.name}</span>
-                      <span
-                        className="bg-[#064039] px-3 py-1 rounded text-white cursor-pointer"
-                        onClick={() => openRiskModal(item.risk)}
-                      >
-                        Risk: {item.risk}
-                      </span>
-                    </div>
+                  <span>2024-07-06</span>
+                  <div className="flex justify-center items-center">
+                    <span>msoffice.exe</span>
+                  </div>
+                  <div className="flex items-end justify-end">
+                    {/* Checkbox at table */}
                     <label className="checkbox-container">
                       <input
                         type="checkbox"
                         className="custom-checkbox"
-                        checked={checkedItems[item.id]}
-                        onChange={() => handleCheckboxChange(item.id)}
+                        checked={checkedItems[index]}
+                        onChange={() => handleCheckboxChange(index)}
                       />
                       <span className="checkmark"></span>
                     </label>

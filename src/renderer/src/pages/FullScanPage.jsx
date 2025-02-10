@@ -82,7 +82,7 @@ const FullScanPage = () => {
   useEffect(() => {
     if (progress === 100) {
       const delayTimeout = setTimeout(() => {
-        navigate('/result-full-scan')
+        navigate('/result-full')
       }, 1000) // Delay 1 detik sebelum pindah ke halaman 'result-fast-scan'
 
       return () => clearTimeout(delayTimeout)

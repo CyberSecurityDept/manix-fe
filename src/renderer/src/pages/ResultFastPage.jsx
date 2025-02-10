@@ -13,10 +13,10 @@ import noMalwareImage from '../assets/no-malware3.jpg'
 // Mengambil BASE_URL dari environment variables
 const BASE_URL = import.meta.env.VITE_BASE_URL
 const DEVICE_INFO_ENDPOINT = '/v1/simplify-get-info'
-const FULLSCAN_ACTIVITIES_ENDPOINT = '/v1/fullscan-activities'
+const FASTSCAN_ACTIVITIES_ENDPOINT = '/v1/activities'
 const DELETE_MALWARE_ENDPOINT = '/v1/delete-malware'
 
-const ResultFullScanPage = () => {
+const ResultFastPage = () => {
   // State for modals
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false)
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false)
@@ -49,12 +49,12 @@ const ResultFullScanPage = () => {
 
     const fetchFullScanActivities = async () => {
       try {
-        const response = await fetch(`${BASE_URL}${FULLSCAN_ACTIVITIES_ENDPOINT}`)
+        const response = await fetch(`${BASE_URL}${FASTSCAN_ACTIVITIES_ENDPOINT}`)
         const data = await response.json()
         if (data.status === 'success') {
           // Pastikan data.data adalah array
-          if (Array.isArray(data.data)) {
-            setActivities(data.data)
+          if (Array.isArray(data.data.data)) {
+            setActivities(data.data.data)
           } else {
             console.error('Expected data.data to be an array:', data.data)
             setActivities([]) // Set to empty array if data is not an array
@@ -246,4 +246,4 @@ const ResultFullScanPage = () => {
   )
 }
 
-export default ResultFullScanPage
+export default ResultFastPage
