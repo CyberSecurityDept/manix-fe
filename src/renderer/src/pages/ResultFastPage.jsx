@@ -17,7 +17,7 @@ import noMalwareImage from '../assets/no-malware3.jpg'
 // Mengambil BASE_URL dari environment variables
 const BASE_URL = import.meta.env.VITE_BASE_URL
 const RESULT_FASTSCAN_ENDPOINT = '/v1/result-fastscan'
-const DELETE_MALWARE_ENDPOINT = '/v1/delete-malware'
+// DELETE_PACKAGES_ENDPOINT tidak digunakan karena URL delete sudah dibentuk secara dinamis
 
 const ResultFastPage = () => {
   // State untuk modals
@@ -39,15 +39,21 @@ const ResultFastPage = () => {
   // State untuk data device dan hasil scan
   const [serialNumber, setSerialNumber] = useState(null)
   const [detectedThreats, setDetectedThreats] = useState([])
-  const [suspiciousActivities, setSuspiciousActivities] = useState([])
+  const [deleteProgress, setDeleteProgress] = useState(0)
 
-  // State untuk device info (menggunakan os_version dan phone_model)
+  // State untuk device info (menggunakan phone_model dan security_patch_date sebagai OS Version)
   const [deviceInfo, setDeviceInfo] = useState({ phone_model: '', os_version: '' })
 
   // State untuk loading
   const [loading, setLoading] = useState(true)
 
   const navigate = useNavigate()
+
+  // Fungsi untuk menandai progress delete selesai
+  const handleProgressComplete = () => {
+    setIsProgressModalOpen(false)
+    setBeforePercentage(lastScanPercentage)
+  }
 
   // Ambil serial number dari localStorage
   useEffect(() => {
@@ -67,49 +73,33 @@ const ResultFastPage = () => {
     }
   }, [serialNumber])
 
-  // Mapping suspiciousActivities ke format objek { date_time, name }
-  useEffect(() => {
-    if (suspiciousActivities.length > 0) {
-      const threats = suspiciousActivities.map((item) => ({
-        date_time: item[0],
-        name: item[1]
-      }))
-      setFilteredThreats(threats)
-    } else {
-      setFilteredThreats([])
-    }
-  }, [suspiciousActivities])
-
   const fetchFastScanResult = async () => {
     try {
       const response = await fetch(
         `${BASE_URL}${RESULT_FASTSCAN_ENDPOINT}?serial_number=${serialNumber}`
       )
       const data = await response.json()
+      console.log('Full response:', data)
       if (data.status === 'success') {
         const result = data.data
-        // Set device info (gunakan os_version untuk label OS Version)
+        console.log('Result:', result)
         setDeviceInfo({
-          phone_model: result.device_info.model,
-          os_version: result.device_info.os_version
+          phone_model: result.phone_model || 'Unknown Model',
+          os_version: result.security_patch_date || 'Unknown OS'
         })
-        // Set security percentage (pastikan field tersedia di response)
-        setSecurityPercentage(result.security_percentage || 0)
-        // Jika ada data last_scan_percentage atau before_percentage, set di sini
-        // setLastScanPercentage(result.last_scan_percentage || null)
-        // setBeforePercentage(result.before_percentage || null)
-        // Set data threats dan suspicious activities
-        setDetectedThreats(result.detected_threats || [])
-        setSuspiciousActivities(result.suspicious_activities || [])
+        setSecurityPercentage(parseFloat(result.security_percentage) || 0)
+        setLastScanPercentage(result.last_scan_percentage || null)
+        setDetectedThreats(result.threats || [])
+        setFilteredThreats(result.threats || [])
       } else {
         console.error('Failed to fetch fast-scan result:', data.message)
         setDetectedThreats([])
-        setSuspiciousActivities([])
+        setFilteredThreats([])
       }
     } catch (error) {
       console.error('Error fetching fast-scan result:', error)
       setDetectedThreats([])
-      setSuspiciousActivities([])
+      setFilteredThreats([])
     } finally {
       setLoading(false)
     }
@@ -119,25 +109,40 @@ const ResultFastPage = () => {
   const openRemoveModal = () => setIsRemoveModalOpen(true)
   const openCompleteModal = () => setIsCompleteModalOpen(true)
 
-  // Handle delete confirmation
-  const handleDeleteConfirmation = async () => {
+  // Fungsi untuk menangani penghapusan paket
+  const handleRemoveScanning = async () => {
+    setIsRemoveModalOpen(false)
     setIsProgressModalOpen(true)
-    try {
-      const response = await fetch(`${BASE_URL}${DELETE_MALWARE_ENDPOINT}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' }
-      })
-      const data = await response.json()
-      if (data.status === 'success') {
-        openCompleteModal()
-      } else {
-        console.error('Failed to delete malware:', data.message)
+    await handleDeleteChecked()
+    await fetchFastScanResult()
+  }
+
+  // Handle delete confirmation
+  const handleDeleteChecked = async () => {
+    const packagesToDelete = Object.keys(checkedItems).filter((pkgName) => checkedItems[pkgName])
+    if (packagesToDelete.length === 0) {
+      alert('No package selected for deletion.')
+      return
+    }
+    const total = packagesToDelete.length
+    let completed = 0
+    for (const packageName of packagesToDelete) {
+      const url = `${BASE_URL}/v1/delete-package/${encodeURIComponent(packageName)}`
+      try {
+        const response = await fetch(url, {
+          method: 'DELETE',
+          headers: { accept: 'application/json' }
+        })
+        if (!response.ok) {
+          console.error(`Failed to delete ${packageName}: Status ${response.status}`)
+        } else {
+          console.log(`Package ${packageName} successfully deleted.`)
+        }
+      } catch (error) {
+        console.error(`Error deleting package ${packageName}:`, error)
       }
-    } catch (error) {
-      console.error('Error deleting malware:', error)
-    } finally {
-      setIsRemoveModalOpen(false)
-      setIsProgressModalOpen(false)
+      completed++
+      setDeleteProgress(Math.floor((completed / total) * 100))
     }
   }
 
@@ -157,25 +162,13 @@ const ResultFastPage = () => {
     setFilteredThreats(sorted)
   }
 
-  // Fungsi checkbox
-  const handleSelectAllChange = (e) => {
-    const isChecked = e.target.checked
-    setSelectAll(isChecked)
-    const newCheckedItems = {}
-    if (isChecked) {
-      filteredThreats.forEach((threat) => {
-        newCheckedItems[threat.name] = true
-      })
-    }
-    setCheckedItems(newCheckedItems)
-  }
-
-  const handleCheckboxChange = (name) => {
+  // Fungsi checkbox untuk threat individual
+  const handleCheckboxChange = (packageName) => {
     setCheckedItems((prev) => {
-      const newChecked = { ...prev, [name]: !prev[name] }
+      const newChecked = { ...prev, [packageName]: !prev[packageName] }
       if (
         filteredThreats.length > 0 &&
-        filteredThreats.every((threat) => newChecked[threat.name])
+        filteredThreats.every((threat) => newChecked[threat.package_name])
       ) {
         setSelectAll(true)
       } else {
@@ -183,6 +176,17 @@ const ResultFastPage = () => {
       }
       return newChecked
     })
+  }
+
+  // Fungsi untuk select all threat secara global
+  const handleSelectAllChange = () => {
+    const allSelected = filteredThreats.every((threat) => checkedItems[threat.package_name])
+    const updatedCheckedItems = { ...checkedItems }
+    filteredThreats.forEach((threat) => {
+      updatedCheckedItems[threat.package_name] = !allSelected
+    })
+    setCheckedItems(updatedCheckedItems)
+    setSelectAll(!allSelected)
   }
 
   // Fungsi untuk menentukan style percentage berdasarkan nilai
@@ -233,7 +237,7 @@ const ResultFastPage = () => {
           }}
         >
           <div className="flex flex-col items-center justify-center">
-            <h2 className="text-[52px] leading-none">{securityPercentage || 0}%</h2>
+            <h2 className="text-[52px] leading-none">{Math.round(securityPercentage) || 0}%</h2>
             <p className="text-[18px]" style={{ color: percentageStyle.color }}>
               {percentageStyle.label}
             </p>
@@ -262,7 +266,7 @@ const ResultFastPage = () => {
           />
           <div className="grid grid-cols-3 gap-4 text-white">
             <div>
-              <p className="font-semibold text-white">OS Version</p>
+              <p className="font-semibold text-white">Security Patch</p>
               <p className="text-gray-100 mt-1">
                 {loading ? <Skeleton width={100} /> : deviceInfo.os_version}
               </p>
@@ -270,7 +274,7 @@ const ResultFastPage = () => {
             <div>
               <p className="font-semibold text-white">Phone Model</p>
               <p className="text-gray-100 mt-1">
-                {loading ? <Skeleton width={150} /> : deviceInfo.phone_model}
+                {loading ? <Skeleton width={150} /> : deviceInfo.phone_model || 'Unknown Model'}
               </p>
             </div>
             <div>
@@ -320,11 +324,15 @@ const ResultFastPage = () => {
                 </div>
                 <div
                   className="col-span-5 flex items-center gap-1 cursor-pointer"
-                  onClick={() => handleSort('name')}
+                  onClick={() => handleSort('package_name')}
                 >
-                  Name{' '}
+                  Package Name{' '}
                   <span>
-                    {sortConfig.key === 'name' ? (sortConfig.direction === 'asc' ? '↓' : '↑') : '↓'}
+                    {sortConfig.key === 'package_name'
+                      ? sortConfig.direction === 'asc'
+                        ? '↓'
+                        : '↑'
+                      : '↓'}
                   </span>
                 </div>
                 <div className="col-span-2 flex justify-end">
@@ -350,16 +358,16 @@ const ResultFastPage = () => {
                     <div className="col-span-5">
                       {threat.date_time ? new Date(threat.date_time).toLocaleString() : '-'}
                     </div>
-                    <div className="flex items-center col-span-5 justify-between">
+                    <div className="flex items-center col-span-7 justify-between">
                       <div className="flex items-center gap-4">
-                        <span>{threat.name}</span>
+                        <span>{threat.package_name}</span>
                       </div>
                       <label className="checkbox-container">
                         <input
                           type="checkbox"
                           className="custom-checkbox"
-                          checked={checkedItems[threat.name] || false}
-                          onChange={() => handleCheckboxChange(threat.name)}
+                          checked={checkedItems[threat.package_name] || false}
+                          onChange={() => handleCheckboxChange(threat.package_name)}
                         />
                         <span className="checkmark"></span>
                       </label>
@@ -418,18 +426,16 @@ const ResultFastPage = () => {
       </div>
 
       {/* Modals */}
-      {isRemoveModalOpen && (
-        <RemoveModal
-          onClose={() => setIsRemoveModalOpen(false)}
-          onConfirm={handleDeleteConfirmation}
+      {isProgressModalOpen && (
+        <DeleteProgressModal
+          progress={deleteProgress}
+          onClose={() => setIsProgressModalOpen(false)}
+          onProgressComplete={handleProgressComplete}
         />
       )}
       {isCompleteModalOpen && <CompleteModal onClose={() => setIsCompleteModalOpen(false)} />}
-      {isProgressModalOpen && (
-        <DeleteProgressModal
-          onClose={() => setIsProgressModalOpen(false)}
-          onProgressComplete={openCompleteModal}
-        />
+      {isRemoveModalOpen && (
+        <RemoveModal onClose={() => setIsRemoveModalOpen(false)} onConfirm={handleRemoveScanning} />
       )}
     </div>
   )

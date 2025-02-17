@@ -80,14 +80,63 @@ const FullScanPage = () => {
   }, [serialNumber]) // Jalankan efek saat serialNumber tersedia
 
   useEffect(() => {
-    if (progress === 100) {
-      const delayTimeout = setTimeout(() => {
-        navigate('/result-full-scan')
-      }, 1000) // Delay 1 detik sebelum pindah ke halaman 'result-fast-scan'
+    if (progress === 100 && serialNumber) {
+      let isMounted = true // Untuk mencegah update state jika komponen sudah unmount
+      const pollInterval = 3000 // Interval polling dalam milidetik
 
-      return () => clearTimeout(delayTimeout)
+      const fetchResult = async () => {
+        try {
+          const resultUrl = `${BASE_URL}/v1/result-fullscan?serial_number=${serialNumber}&scan_type=full-scan`
+          const response = await fetch(resultUrl, {
+            method: 'GET',
+            headers: {
+              accept: 'application/json'
+            }
+          })
+
+          if (!response.ok) {
+            // Jika response tidak ok (misalnya 404), ambil data error
+            const errorData = await response.json()
+            console.warn('Data belum siap, polling lagi:', errorData)
+            // Coba polling lagi setelah delay
+            if (isMounted) {
+              setTimeout(fetchResult, pollInterval)
+            }
+            return
+          }
+
+          // Jika response ok, parse datanya
+          const data = await response.json()
+
+          if (data.message === 'Get result successfully' && data.status === 'success') {
+            // Jika data hasil scan sudah siap, delay 1 detik sebelum navigasi
+            setTimeout(() => {
+              if (isMounted) {
+                navigate('/result-full-scan')
+              }
+            }, 1000)
+          } else {
+            console.warn('Response tidak sesuai, polling lagi:', data)
+            if (isMounted) {
+              setTimeout(fetchResult, pollInterval)
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching fullscan result:', error)
+          if (isMounted) {
+            setTimeout(fetchResult, pollInterval)
+          }
+        }
+      }
+
+      fetchResult()
+
+      // Cleanup function untuk membatalkan polling jika komponen unmount
+      return () => {
+        isMounted = false
+      }
     }
-  }, [progress, navigate])
+  }, [progress, navigate, serialNumber])
 
   return (
     <div

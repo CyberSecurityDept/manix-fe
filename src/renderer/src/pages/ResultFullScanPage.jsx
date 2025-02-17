@@ -46,6 +46,7 @@ const ResultFullScanPage = () => {
   const [securityPercentage, setSecurityPercentage] = useState(0)
   const [lastScanPercentage, setLastScanPercentage] = useState(null)
   const [deviceImageData, setDeviceImageData] = useState(null)
+  const [deleteProgress, setDeleteProgress] = useState(0)
 
   // Ambil serial_number dari localStorage
   useEffect(() => {
@@ -244,21 +245,29 @@ const ResultFullScanPage = () => {
   }
 
   // Fungsi untuk checkbox individual
-  const handleCheckboxChange = (threatName) => {
-    setCheckedItems((prev) => ({
-      ...prev,
-      [threatName]: !prev[threatName]
-    }))
+  const handleCheckboxChange = (packageName) => {
+    setCheckedItems((prev) => {
+      const newChecked = { ...prev, [packageName]: !prev[packageName] }
+      // Jika semua item dalam filteredThreats sudah tercentang, set selectAll ke true, jika tidak false
+      if (
+        filteredThreats.length > 0 &&
+        filteredThreats.every((threat) => newChecked[threat.package_name])
+      ) {
+        setSelectAll(true)
+      } else {
+        setSelectAll(false)
+      }
+      return newChecked
+    })
   }
 
   // Fungsi untuk select all secara global (untuk seluruh threat)
   const handleSelectAllChange = () => {
-    if (!resultData?.threats) return
-
-    const allSelected = resultData.threats.every((threat) => checkedItems[threat.name])
+    // Gunakan data yang ditampilkan (filteredThreats)
+    const allSelected = filteredThreats.every((threat) => checkedItems[threat.package_name])
     const updatedCheckedItems = { ...checkedItems }
-    resultData.threats.forEach((threat) => {
-      updatedCheckedItems[threat.name] = !allSelected
+    filteredThreats.forEach((threat) => {
+      updatedCheckedItems[threat.package_name] = !allSelected
     })
     setCheckedItems(updatedCheckedItems)
     setSelectAll(!allSelected)
@@ -266,39 +275,33 @@ const ResultFullScanPage = () => {
 
   // Fungsi untuk delete package berdasarkan threat yang dicentang
   const handleDeleteChecked = async () => {
-    // Ambil semua package name yang dicentang dari state checkedItems
     const packagesToDelete = Object.keys(checkedItems).filter((pkgName) => checkedItems[pkgName])
-
     if (packagesToDelete.length === 0) {
       alert('No package selected for deletion.')
       return
     }
-
     if (!window.confirm('Are you sure you want to delete the selected packages?')) {
       return
     }
-
-    try {
-      // Buat URL endpoint delete (tanpa package name di path)
-      const url = `${BASE_URL}/v1/delete-package`
-      const response = await fetch(url, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json', // Pastikan header Content-Type di-set ke application/json
-          accept: 'application/json'
-        },
-        // Kirim data berupa JSON yang berisi array package name
-        body: JSON.stringify({ packages: packagesToDelete })
-      })
-
-      if (!response.ok) {
-        console.error(`Failed to delete packages: Status ${response.status}`)
-      } else {
-        alert('Deletion process completed.')
-        // Optional: Refresh data atau update state jika diperlukan
+    const total = packagesToDelete.length
+    let completed = 0
+    for (const packageName of packagesToDelete) {
+      const url = `${BASE_URL}/v1/delete-package/${encodeURIComponent(packageName)}`
+      try {
+        const response = await fetch(url, {
+          method: 'DELETE',
+          headers: { accept: 'application/json' }
+        })
+        if (!response.ok) {
+          console.error(`Failed to delete ${packageName}: Status ${response.status}`)
+        } else {
+          console.log(`Package ${packageName} successfully deleted.`)
+        }
+      } catch (error) {
+        console.error(`Error deleting package ${packageName}:`, error)
       }
-    } catch (error) {
-      console.error('Error deleting packages:', error)
+      completed++
+      setDeleteProgress(Math.floor((completed / total) * 100))
     }
   }
 
@@ -307,6 +310,7 @@ const ResultFullScanPage = () => {
     setIsRemoveModalOpen(false)
     setIsProgressModalOpen(true)
     await handleDeleteChecked()
+    await fetchResultData()
   }
 
   // Fungsi untuk menandai progress delete selesai
@@ -346,7 +350,7 @@ const ResultFullScanPage = () => {
           }}
         >
           <div className="flex flex-col items-center justify-center">
-            <h2 className="text-[52px] leading-none">{securityPercentage || 0}%</h2>
+            <h2 className="text-[52px] leading-none">{Math.round(securityPercentage) || 0}%</h2>
             <p className="text-[18px]" style={{ color: percentageStyle.color }}>
               {percentageStyle.label}
             </p>
@@ -622,16 +626,19 @@ const ResultFullScanPage = () => {
                     <div className="col-span-5">
                       {threat.date_time ? new Date(threat.date_time).toLocaleString() : '-'}
                     </div>
-                    <div className="flex items-center col-span-5 justify-between">
-                      <div className="flex items-center gap-4">
+                    <div className="flex items-center  col-span-7 justify-between">
+                      <div
+                        className="flex items-center gap-4 overflow-hidden whitespace-nowrap text-ellipsis"
+                        style={{ maxWidth: '200px' }}
+                      >
                         <span>{threat.name}</span>
                       </div>
                       <label className="checkbox-container">
                         <input
                           type="checkbox"
                           className="custom-checkbox"
-                          checked={checkedItems[threat.name] || false}
-                          onChange={() => handleCheckboxChange(threat.name)}
+                          checked={checkedItems[threat.package_name] || false}
+                          onChange={() => handleCheckboxChange(threat.package_name)}
                         />
                         <span className="checkmark"></span>
                       </label>
@@ -669,10 +676,12 @@ const ResultFullScanPage = () => {
             {/* Delete Progress Modal */}
             {isProgressModalOpen && (
               <DeleteProgressModal
+                progress={deleteProgress}
                 onClose={() => setIsProgressModalOpen(false)}
                 onProgressComplete={handleProgressComplete}
               />
             )}
+
             {/* Risk Modal */}
             <RiskModal
               isOpen={isRiskModalOpen}
