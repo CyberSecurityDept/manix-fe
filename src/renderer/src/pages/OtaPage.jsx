@@ -20,12 +20,13 @@ const OTA = () => {
   const [isUpdateProgressModalOpen, setIsUpdateProgressModalOpen] = useState(false)
   const [updateData, setUpdateData] = useState(null)
 
-  const checkUpdate = async () => {
+  const checkAPPUpdate = async () => {
     try {
+      // Tampilkan modal pengecekan update
       setIsUpdateModalOpen(true)
-      const url = `${BASE_URL}${CHECK_URL}`
-      console.log('Fetching data from:', url)
 
+      // Pengecekan BE
+      const url = `${BASE_URL}${CHECK_URL}`
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -34,35 +35,36 @@ const OTA = () => {
         },
         body: JSON.stringify({})
       })
-
-      console.log('Response status:', response.status)
-
       if (!response.ok) {
-        throw new Error(`Network response was not ok. Status: ${response.status}`)
+        throw new Error(`Status: ${response.status}`)
       }
-
       const data = await response.json()
-      console.log('Update data:', data)
       setUpdateData(data)
 
-      // Jika ada versi baru, tampilkan NewVersionModal
-      if (data.current_tag !== data.latest_remote_tag) {
-        setIsUpdateModalOpen(false)
-        setIsNewVersionModalOpen(true)
-      } else {
-        setIsUpdateModalOpen(false)
-        alert('You are using the latest version.')
-      }
+      // Pengecekan FE melalui IPC (kirim pesan untuk cek update FE)
+      window.electron.ipcRenderer.send('start-fe-update')
+
+      // Kemudian kamu bisa mendengarkan event dari main untuk FE
+      window.electron.ipcRenderer.on('fe-update-status', (feStatus) => {
+        // Gabungkan data BE dan FE untuk memutuskan apakah tampilkan modal update
+        if (data.current_tag !== data.latest_remote_tag || feStatus.updateAvailable) {
+          setIsUpdateModalOpen(false)
+          setIsNewVersionModalOpen(true)
+        } else {
+          setIsUpdateModalOpen(false)
+          alert('You are using the latest version.')
+        }
+      })
     } catch (error) {
-      console.error('Error fetching update data:', error)
+      console.error(error)
       setIsUpdateModalOpen(false)
-      alert(`Failed to check for updates. Error: ${error.message}`)
+      alert(`Error: ${error.message}`)
     }
   }
 
   const handleUpdate = async () => {
-    setIsNewVersionModalOpen(false) // Tutup NewVersionModal
-    setIsUpdateProgressModalOpen(true) // Tampilkan UpdateProgress modal
+    setIsNewVersionModalOpen(false)
+    setIsUpdateProgressModalOpen(true)
 
     try {
       const url = `${BASE_URL}${UPDATE_URL}`
@@ -86,17 +88,16 @@ const OTA = () => {
       const data = await response.json()
       console.log('Update response:', data)
 
-      // Tampilkan pesan sukses berdasarkan respons
       if (data.status === 'success') {
-        alert(data.message) // Tampilkan pesan sukses
+        // Setelah BE update, trigger update FE via IPC
+        window.electron.ipcRenderer.send('start-fe-update')
       } else {
         throw new Error(data.message || 'Update failed')
       }
     } catch (error) {
       console.error('Error updating version:', error)
       alert(`Failed to update. Error: ${error.message}`)
-    } finally {
-      setIsUpdateProgressModalOpen(false) // Tutup UpdateProgress modal setelah selesai
+      setIsUpdateProgressModalOpen(false)
     }
   }
 
@@ -114,7 +115,6 @@ const OTA = () => {
 
       {/* APP & CYBER Section */}
       <div className="w-[1022px] h-[222px] relative border-2 border-y-[#0C9A8D] border-x-[#05564F] bg-gradient-to-b from-[#091817] to-[#0C1612] flex justify-around items-center mb-8">
-        {/* Plus Sign */}
         <img src={plusSign} alt="Plus Sign" className="absolute top-[-14px] left-[-13px] w-6 h-6" />
         <img
           src={plusSign}
@@ -129,7 +129,7 @@ const OTA = () => {
         >
           <h2 className="text-white text-lg mb-2">APP V1.1.1.2</h2>
           <button
-            onClick={checkUpdate}
+            onClick={checkAPPUpdate}
             className="text-white py-1 px-4"
             style={{
               backgroundImage: `url(${UpdateBorder})`,
@@ -152,7 +152,7 @@ const OTA = () => {
         >
           <h2 className="text-white text-lg mb-2">CYBER V1.2.3.4</h2>
           <button
-            onClick={checkUpdate}
+            onClick={() => alert('Not implemented')}
             className="text-white py-1 px-4"
             style={{
               backgroundImage: `url(${UpdateBorder})`,
@@ -171,7 +171,6 @@ const OTA = () => {
 
       {/* UPDATE LOG Section */}
       <div className="w-[1022px] h-[444px] relative border-2 border-y-[#0C9A8D] border-x-[#05564F] bg-gradient-to-b from-[#091817] to-[#0C1612] p-6">
-        {/* Plus Sign */}
         <img src={plusSign} alt="Plus Sign" className="absolute top-[-14px] left-[-13px] w-6 h-6" />
         <img
           src={plusSign}
@@ -179,7 +178,6 @@ const OTA = () => {
           className="absolute bottom-[-12px] right-[-12px] w-6 h-6"
         />
 
-        {/* Header and View More Button */}
         <div className="flex justify-between items-center px-10 py-4 border-b border-[#05564F]">
           <h3 className="text-white text-xl font-semibold">Version Release</h3>
           <button className="bg-transparent border border-[#0C9A8D] text-[#FFFFFF] py-1 px-4 rounded hover:border-[#00FFE7]">
@@ -187,13 +185,11 @@ const OTA = () => {
           </button>
         </div>
 
-        {/* Table Header */}
         <div className="flex justify-between items-center px-10 py-2 bg-[#0C9A8D] text-[#091817] font-semibold">
           <div className="text-center w-1/2">Patch</div>
           <div className="text-center w-1/2">Data</div>
         </div>
 
-        {/* Update Table Rows */}
         <div className="overflow-y-auto h-[320px]">
           {['APK V1.1.12', 'APK V1.1.12', 'CYBER V1.1.12'].map((patch, index) => (
             <div
@@ -207,12 +203,12 @@ const OTA = () => {
         </div>
       </div>
 
-      {/* Update Modal */}
+      {/* Modal Update */}
       {isUpdateModalOpen && (
         <UpdateModal onClose={() => setIsUpdateModalOpen(false)} updateData={updateData} />
       )}
 
-      {/* New Version Modal */}
+      {/* Modal New Version */}
       {isNewVersionModalOpen && (
         <NewVersionModal
           onClose={() => setIsNewVersionModalOpen(false)}
@@ -221,7 +217,7 @@ const OTA = () => {
         />
       )}
 
-      {/* Update Progress Modal */}
+      {/* Modal Update Progress */}
       {isUpdateProgressModalOpen && (
         <UpdateProgress onClose={() => setIsUpdateProgressModalOpen(false)} />
       )}

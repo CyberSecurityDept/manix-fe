@@ -1,11 +1,13 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
+import { autoUpdater } from 'electron-updater'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
+let mainWindow
+
 function createWindow() {
-  // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: true,
@@ -15,13 +17,13 @@ function createWindow() {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: true,
-      webviewTag: true, // Mengizinkan penggunaan webview
+      webviewTag: true, // izinkan penggunaan webview
       webSecurity: false,
       fullscreen: true
     }
   })
 
-  // Set Content Security Policy
+  // Atur Content Security Policy
   mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
     callback({
       responseHeaders: {
@@ -41,61 +43,72 @@ function createWindow() {
     mainWindow.show()
   })
 
+  // Buka URL eksternal di browser default
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
 
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
+  // Load URL renderer (development) atau file lokal (production)
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+
+  // --- Integrasi electron-updater ---
+  // Mulai update FE (electron-updater) ketika renderer mengirim pesan
+  ipcMain.on('start-fe-update', async () => {
+    try {
+      const result = await autoUpdater.checkForUpdates()
+      // Misal, jika update tersedia:
+      const updateAvailable = result.updateInfo && result.updateInfo.version !== app.getVersion()
+      mainWindow.webContents.send('fe-update-status', {
+        updateAvailable,
+        version: result.updateInfo.version
+      })
+    } catch (error) {
+      mainWindow.webContents.send('fe-update-status', {
+        updateAvailable: false,
+        error: error.message
+      })
+    }
+  })
+
+  // Kirim progress download FE ke renderer
+  autoUpdater.on('download-progress', (progressObj) => {
+    mainWindow.webContents.send('fe-update-progress', progressObj)
+  })
+
+  // Setelah update FE selesai didownload, kirim notifikasi ke renderer
+  autoUpdater.on('update-downloaded', () => {
+    mainWindow.webContents.send('fe-update-downloaded')
+    // Jangan langsung quit; tunggu BE update selesai
+  })
+
+  // Ketika renderer mengirim pesan untuk quit dan install update FE
+  ipcMain.on('quit-and-install', () => {
+    autoUpdater.quitAndInstall()
+  })
 }
 
-ipcMain.on('get-asset-path', (event) => {
-  event.returnValue =
-    process.env.NODE_ENV === 'development'
-      ? join(__dirname, '../../src/renderer/src/assets')
-      : join(process.resourcesPath, 'assets')
-})
-
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  // Set app user model id for windows
+  // Set App User Model ID (untuk Windows)
   electronApp.setAppUserModelId('com.electron')
 
-  // Default open or close DevTools by F12 in development
-  // and ignore CommandOrControl + R in production.
-  // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
   ipcMain.on('ping', () => console.log('pong'))
 
   createWindow()
 
-  app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
+  app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+  if (process.platform !== 'darwin') app.quit()
 })
-
-// In this file you can include the rest of your app"s specific main process
-// code. You can also put them in separate files and require them here.

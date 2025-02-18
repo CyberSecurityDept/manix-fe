@@ -4,7 +4,6 @@ import SearchDevicePage from './pages/SearchDevicePage'
 import DeviceInfoPage from './pages/DeviceInfoPage'
 import ADBPage from './pages/ADBPage'
 import FastScanPage from './pages/FastScanPage'
-import ResultFastScanPage from './pages/ResultFastScanPage'
 import UnderMaintenance from './pages/UnderMaintenance'
 import ResultFastPage from './pages/ResultFastPage'
 import FullScanPage from './pages/FullScanPage'
@@ -12,8 +11,7 @@ import ResultFullScanPage from './pages/ResultFullScanPage'
 import OTA from './pages/OtaPage'
 import InformationPage from './pages/InformationPage'
 import HistoryPage from './pages/HistoryPage'
-import ResultFullPage from './pages/ResultFullPage'
-import HistoryDetailPage from './pages/DetailPage'
+import HistoryDetailPage from './pages/HistoryDetailPage'
 
 function App() {
   // Pastikan ipcHandle hanya dipanggil jika window.electron ada
@@ -43,14 +41,8 @@ function App() {
         {/* Route untuk halaman FastScanPage */}
         <Route path="/fast-scan" element={<FastScanPage />} />
 
-        {/* Route untuk halaman ResultFastScanPage */}
-        <Route path="/result-fast-scan" element={<ResultFastScanPage />} />
-
         {/* Route untuk halaman ResultFastPage */}
         <Route path="/result-fast" element={<ResultFastPage />} />
-
-        {/* Route untuk halaman ResultFullPage */}
-        <Route path="/result-full" element={<ResultFullPage />} />
 
         {/* Route untuk halaman FullScanPage */}
         <Route path="/full-scan" element={<FullScanPage />} />
