@@ -13,6 +13,7 @@ import OTA from './pages/OtaPage'
 import InformationPage from './pages/InformationPage'
 import HistoryPage from './pages/HistoryPage'
 import ResultFullPage from './pages/ResultFullPage'
+import HistoryDetailPage from './pages/DetailPage'
 
 function App() {
   // Pastikan ipcHandle hanya dipanggil jika window.electron ada
@@ -57,8 +58,11 @@ function App() {
         {/* Route untuk halaman ResultFullScanPage */}
         <Route path="/result-full-scan" element={<ResultFullScanPage />} />
 
-        {/* Route untuk halaman ResultFullScanPage */}
+        {/* Route untuk halaman HistoryPage */}
         <Route path="/history" element={<HistoryPage />} />
+
+        {/* Route untuk halaman HistoryDetailPage */}
+        <Route path="/history-detail" element={<HistoryDetailPage />} />
 
         {/* Route untuk halaman OTA */}
         <Route path="/ota" element={<OTA />} />

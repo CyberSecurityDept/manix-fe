@@ -6,7 +6,7 @@ import Border from '../assets/border/App-border.svg'
 import UpdateBorder from '../assets/border/update.svg'
 import UpdateModal from '../components/modal/Update'
 import NewVersionModal from '../components/modal/NewVersion'
-import UpdateProgress from '../components/modal/UpdateProgress' // Import UpdateProgress modal
+import UpdateProgress from '../components/modal/UpdateProgress'
 import backIcon from '../assets/back-Icon.svg'
 
 const OTA = () => {
@@ -22,7 +22,7 @@ const OTA = () => {
 
   const checkUpdate = async () => {
     try {
-      setIsUpdateModalOpen(true) // Buka UpdateModal
+      setIsUpdateModalOpen(true)
       const url = `${BASE_URL}${CHECK_URL}`
       console.log('Fetching data from:', url)
 

@@ -2,14 +2,10 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { autoUpdater } from 'electron-updater'
-
-// Deklarasikan mainWindow secara global
-let mainWindow
 
 function createWindow() {
   // Create the browser window.
-  mainWindow = new BrowserWindow({
+  const mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: true,
@@ -51,6 +47,7 @@ function createWindow() {
   })
 
   // HMR for renderer base on electron-vite cli.
+  // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
@@ -66,12 +63,15 @@ ipcMain.on('get-asset-path', (event) => {
 })
 
 // This method will be called when Electron has finished
-// // initialization and is ready to create browser windows.
+// initialization and is ready to create browser windows.
+// Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  // Set app user model id for Windows
+  // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
   // Default open or close DevTools by F12 in development
+  // and ignore CommandOrControl + R in production.
+  // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
@@ -88,63 +88,14 @@ app.whenReady().then(() => {
   })
 })
 
-//   // Konfigurasi autoUpdater
-//   autoUpdater.checkForUpdatesAndNotify()
-
-//   autoUpdater.on('checking-for-update', () => {
-//     console.log('Memeriksa pembaruan...')
-//     if (mainWindow) {
-//       mainWindow.webContents.send('update-status', 'Memeriksa pembaruan...')
-//     }
-//   })
-
-//   autoUpdater.on('update-available', () => {
-//     console.log('Pembaruan tersedia.')
-//     if (mainWindow) {
-//       mainWindow.webContents.send('update-status', 'Pembaruan tersedia. Mengunduh...')
-//     }
-//   })
-
-//   autoUpdater.on('update-not-available', () => {
-//     console.log('Tidak ada pembaruan tersedia.')
-//     if (mainWindow) {
-//       mainWindow.webContents.send('update-status', 'Tidak ada pembaruan tersedia.')
-//     }
-//   })
-
-//   autoUpdater.on('download-progress', (progress) => {
-//     console.log(`Progres unduhan: ${progress.percent}%`)
-//     if (mainWindow) {
-//       mainWindow.webContents.send('update-progress', progress.percent)
-//     }
-//   })
-
-//   autoUpdater.on('update-downloaded', () => {
-//     console.log('Pembaruan telah diunduh.')
-//     if (mainWindow) {
-//       mainWindow.webContents.send(
-//         'update-status',
-//         'Pembaruan telah diunduh. Mulai ulang aplikasi untuk menerapkan.'
-//       )
-//     }
-//   })
-
-//   autoUpdater.on('error', (error) => {
-//     console.error('Kesalahan selama pembaruan:', error)
-//     if (mainWindow) {
-//       mainWindow.webContents.send('update-error', error.message)
-//     }
-//   })
-// })
-
-// Restart aplikasi untuk menerapkan pembaruan
-ipcMain.on('restart-app', () => {
-  autoUpdater.quitAndInstall()
-})
-
-// Quit when all windows are closed, except on macOS.
+// Quit when all windows are closed, except on macOS. There, it's common
+// for applications and their menu bar to stay active until the user quits
+// explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
 })
+
+// In this file you can include the rest of your app"s specific main process
+// code. You can also put them in separate files and require them here.

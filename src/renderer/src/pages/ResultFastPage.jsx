@@ -38,7 +38,7 @@ const ResultFastPage = () => {
 
   // State untuk data device dan hasil scan
   const [serialNumber, setSerialNumber] = useState(null)
-  const [detectedThreats, setDetectedThreats] = useState([])
+  const [setDetectedThreats] = useState([])
   const [deleteProgress, setDeleteProgress] = useState(0)
 
   // State untuk device info (menggunakan phone_model dan security_patch_date sebagai OS Version)
