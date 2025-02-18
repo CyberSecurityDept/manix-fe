@@ -1,52 +1,54 @@
-import React, { useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import bgDarkmode from '../assets/bg-darkmode.png';
-import modalBackground from '../assets/border-box.svg';
-import adbImage from '../assets/adb.svg';
-import plusSign from '../assets/plus-sign.svg';
+import { useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
+import bgDarkmode from '../assets/bg-darkmode.png'
+import modalBackground from '../assets/border-box.svg'
+import adbImage from '../assets/adb.svg'
+import plusSign from '../assets/plus-sign.svg'
 
 // Mengambil BASE_URL dari environment variables
-const BASE_URL = import.meta.env.VITE_BASE_URL;
-const ENDPOINT = "/v1/check-device-status/";
+const BASE_URL = import.meta.env.VITE_BASE_URL
+const ENDPOINT = '/v1/check-device-status/'
 
 const ADBPage = () => {
-  const navigate = useNavigate();
-  const isFetchingRef = useRef(false); 
+  const navigate = useNavigate()
+  const isFetchingRef = useRef(false)
 
   useEffect(() => {
     const fetchData = async () => {
-      if (isFetchingRef.current) return; 
+      if (isFetchingRef.current) return // Cegah pemanggilan jika sedang fetching
 
-      isFetchingRef.current = true; 
+      isFetchingRef.current = true // Set fetching menjadi true
       try {
         // Gabungkan BASE_URL dengan ENDPOINT
-        const response = await fetch(`${BASE_URL}${ENDPOINT}`);
-        const result = await response.json();
-        console.log('API Response:', result);
+        const response = await fetch(`${BASE_URL}${ENDPOINT}`)
+        const result = await response.json()
+        console.log('API Response:', result)
 
         // Akses data yang berada di dalam objek "data"
         const { is_cable_connected, is_adb_connected } = result.data;
 
         // Cek kondisi is_cable_connected dan is_adb_connected
         if (is_cable_connected && is_adb_connected) {
-          navigate('/device-info');
+          // Pindah ke DeviceInfoPage jika kabel dan adb tersambung
+          navigate('/device-info')
         } else if (!is_cable_connected && is_adb_connected) {
-          navigate('/search-device');
+          // Pindah ke SearchDevicePage jika kabel tersambung tapi adb tidak tersambung
+          navigate('/')
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching data:', error)
       } finally {
-        isFetchingRef.current = false; 
+        isFetchingRef.current = false // Reset fetching state
       }
     };
 
-    fetchData(); // Panggilan pertama
-    const intervalId = setInterval(fetchData, 500); 
+    fetchData() // Panggilan pertama
+    const intervalId = setInterval(fetchData, 1000) // Atur interval untuk memanggil fetchData setiap 1 detik
 
     return () => {
-      clearInterval(intervalId);
-    };
-  }, [navigate]);
+      clearInterval(intervalId) // Membersihkan interval saat komponen dibongkar
+    }
+  }, [navigate])
 
   return (
     <div

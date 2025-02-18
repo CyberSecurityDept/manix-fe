@@ -16,7 +16,7 @@ const SearchDevicePage = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (isFetchingRef.current) return; 
-      
+
       isFetchingRef.current = true; // Set fetching menjadi true
       try {
         const response = await fetch(`${BASE_URL}${ENDPOINT}`);

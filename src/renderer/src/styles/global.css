@@ -16,24 +16,16 @@
     animation: progressAnimation 2s linear infinite;
   }
   
-/* Custom Scrollbar */
-/* Scrollbar track (horizontal and vertical) */
-::-webkit-scrollbar {
-  width: 8px;  /* Width for vertical scrollbar */
-  background-color: #064039; /* Dark blue background for scrollbar track */
-  border: none;
+.gradient-1 {
+  background-image: linear-gradient(to left, rgba(5, 199, 180, 0.25),rgba(255,0,0,0));
 }
 
-/* Scrollbar handle */
-::-webkit-scrollbar-thumb {
-  background-color: #00B3A2; /* Lighter blue for scrollbar handle */
-
+.gradient-custom {
+  background: linear-gradient(270deg, rgba(5, 199, 180, 0.5) 0%, rgba(1, 92, 84, 0.05) 28%);
 }
 
-
-/* Scrollbar buttons (if any, but note that not all browsers show them) */
-::-webkit-scrollbar-button {
-  background-color: #064039;
+.box-gradient {
+  box-shadow: 2px 0px 20px 2px rgba(25,67,60,0.62) inset,-2px 0px 20px 2px rgba(25,67,60,0.62) inset;
+  /* -webkit-box-shadow: 15px 1px 20px 21px rgba(25,67,60,0.62) inset;
+  -moz-box-shadow: 15px 1px 20px 21px rgba(25,67,60,0.62) inset; */
 }
-
-

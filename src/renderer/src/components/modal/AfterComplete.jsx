@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import modalBackground from '../../assets/border/after-complete-border.svg';
 import plusSign from '../../assets/plus-sign.svg';
 
-const AfterCompleteModal = ({ onClose }) => {
+const CompleteModal = ({ onClose }) => {
     const navigate = useNavigate();
   
     useEffect(() => {
@@ -53,4 +53,4 @@ const AfterCompleteModal = ({ onClose }) => {
   )
 }
 
-export default AfterCompleteModal
+export default CompleteModal

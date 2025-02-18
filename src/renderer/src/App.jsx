@@ -1,17 +1,17 @@
 import React from 'react'
-import HomePage from './pages/HomePage'
+import { HashRouter as Router, Route, Routes } from 'react-router-dom'
 import SearchDevicePage from './pages/SearchDevicePage'
 import DeviceInfoPage from './pages/DeviceInfoPage'
 import ADBPage from './pages/ADBPage'
-import { HashRouter as Router, Route, Routes } from 'react-router-dom'
 import FastScanPage from './pages/FastScanPage'
-import ResultFastScanPage from './pages/ResultFastScanPage'
-import HistoryPage from './pages/HistoryPage'
-import CaseManagementDashboard from './pages/CaseManagement/Dashboard'
-import OTA from './pages/OtaPage'
 import UnderMaintenance from './pages/UnderMaintenance'
-import IframePage from './pages/IframePage'
-import AddDevicePage from './pages/CaseManagement/AddDevicePage'
+import ResultFastPage from './pages/ResultFastPage'
+import FullScanPage from './pages/FullScanPage'
+import ResultFullScanPage from './pages/ResultFullScanPage'
+import OTA from './pages/OtaPage'
+import InformationPage from './pages/InformationPage'
+import HistoryPage from './pages/HistoryPage'
+import HistoryDetailPage from './pages/HistoryDetailPage'
 
 function App() {
   // Pastikan ipcHandle hanya dipanggil jika window.electron ada
@@ -26,23 +26,14 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Route untuk halaman utama */}
-        <Route path="/" element={<HomePage />} />
-
-        {/* Route untuk maintenance*/}
-        <Route path="/maintenance" element={<UnderMaintenance />} />
-
-        {/* Route untuk OTA */}
-        <Route path="/ota" element={<OTA />} />
-
-        {/* Route untuk IframePage */}
-        <Route path="/iframe-page" element={<IframePage />} />
-
         {/* Route untuk halaman SearchDevicePage */}
-        <Route path="/search-device" element={<SearchDevicePage />} />
+        <Route path="/" element={<SearchDevicePage />} />
 
         {/* Route untuk halaman ADBPage */}
         <Route path="/adb-device" element={<ADBPage />} />
+
+        {/* Route untuk maintenance*/}
+        <Route path="/maintenance" element={<UnderMaintenance />} />
 
         {/* Route untuk halaman DeviceInfoPage */}
         <Route path="/device-info" element={<DeviceInfoPage />} />
@@ -50,17 +41,26 @@ function App() {
         {/* Route untuk halaman FastScanPage */}
         <Route path="/fast-scan" element={<FastScanPage />} />
 
-        {/* Route untuk halaman ResultFastScanPage */}
-        <Route path="/result-fast-scan" element={<ResultFastScanPage />} />
+        {/* Route untuk halaman ResultFastPage */}
+        <Route path="/result-fast" element={<ResultFastPage />} />
+
+        {/* Route untuk halaman FullScanPage */}
+        <Route path="/full-scan" element={<FullScanPage />} />
+
+        {/* Route untuk halaman ResultFullScanPage */}
+        <Route path="/result-full-scan" element={<ResultFullScanPage />} />
 
         {/* Route untuk halaman HistoryPage */}
         <Route path="/history" element={<HistoryPage />} />
 
-        {/* Route untuk halaman CaseManagementDashboard*/}
-        <Route path="/dashboard" element={<CaseManagementDashboard />} />
+        {/* Route untuk halaman HistoryDetailPage */}
+        <Route path="/history-detail" element={<HistoryDetailPage />} />
 
-        {/* Route untuk halaman AddDevicePage */}
-        <Route path="/add-device" element={<AddDevicePage />} />
+        {/* Route untuk halaman OTA */}
+        <Route path="/ota" element={<OTA />} />
+
+        {/* Route untuk halaman Information */}
+        <Route path="/info" element={<InformationPage />} />
       </Routes>
     </Router>
   )
