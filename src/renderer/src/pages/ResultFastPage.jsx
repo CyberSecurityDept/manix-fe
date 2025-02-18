@@ -38,7 +38,7 @@ const ResultFastPage = () => {
 
   // State untuk data device dan hasil scan
   const [serialNumber, setSerialNumber] = useState(null)
-  const [setDetectedThreats] = useState([])
+  const [detectedThreats, setDetectedThreats] = useState([])
   const [deleteProgress, setDeleteProgress] = useState(0)
 
   // State untuk device info (menggunakan phone_model dan security_patch_date sebagai OS Version)
@@ -127,7 +127,7 @@ const ResultFastPage = () => {
     const total = packagesToDelete.length
     let completed = 0
     for (const packageName of packagesToDelete) {
-      const url = `${BASE_URL}/v1/delete-package/${encodeURIComponent(packageName)}`
+      const url = `${BASE_URL}/v1/delete-package-fastscan/${encodeURIComponent(packageName)}`
       try {
         const response = await fetch(url, {
           method: 'DELETE',

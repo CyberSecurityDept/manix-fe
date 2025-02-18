@@ -361,6 +361,14 @@ const DeviceInfoPage = () => {
           <div className="absolute inset-0 bg-teal-700 opacity-0 hover:opacity-30 transition-opacity"></div>
         </button>
       </div>
+
+      {/* OTA Button */}
+      <button
+        className="absolute bottom-[52px] right-[52px] flex items-center justify-center w-[143px] h-[50px] bg-[#091817] text-sm font-bold text-white border border-[#4FD1C5] hover:bg-teal-700 font-roboto"
+        onClick={() => navigate('/ota')}
+      >
+        <span>OTA</span>
+      </button>
     </div>
   );
 };

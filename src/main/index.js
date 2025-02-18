@@ -11,7 +11,8 @@ function createWindow() {
     width: 900,
     height: 670,
     show: true,
-    frame: true,
+    fullscreen: true,
+    frame: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
@@ -19,7 +20,6 @@ function createWindow() {
       sandbox: true,
       webviewTag: true, // izinkan penggunaan webview
       webSecurity: false,
-      fullscreen: true
     }
   })
 
