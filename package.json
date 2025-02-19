@@ -51,7 +51,7 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "Bagongs",
+        "owner": "CyberSecurityDept",
         "repo": "manix-fe"
       }
     ]
