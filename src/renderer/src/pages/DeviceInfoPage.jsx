@@ -325,7 +325,7 @@ const DeviceInfoPage = () => {
       {/* Tombol Scan */}
       <div className="flex space-x-8 mt-6 font-aldrich">
         <button
-          className={`w-[801px] h-[120px] text-xl font-bold bg-transparent border border-teal-400 hover:bg-teal-700 rounded-md shadow-lg flex flex-col justify-center items-center relative ${
+          className={`w-[389px] h-[120px] text-xl font-bold bg-transparent border border-teal-400 hover:bg-teal-700 rounded-md shadow-lg flex flex-col justify-center items-center relative ${
             !selectedName ? 'cursor-not-allowed opacity-50' : ''
           }`}
           style={{
