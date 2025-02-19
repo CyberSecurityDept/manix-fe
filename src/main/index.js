@@ -59,23 +59,31 @@ function createWindow() {
   // --- Integrasi electron-updater untuk FE ---
   ipcMain.on('start-fe-update', async () => {
     try {
-      console.log(app.getVersion())
-      const result = await autoUpdater.checkForUpdates()
-      console.log('Memeriksa pembaruan...')
-      // Misal, jika update tersedia:
-      const updateAvailable = result.updateInfo && result.updateInfo.version !== app.getVersion()
+      console.log('Memulai pengecekan update FE...');
+      console.log('Versi aplikasi saat ini:', app.getVersion());
+      const result = await autoUpdater.checkForUpdates();
+      console.log('Hasil pengecekan update:', result);
+      const updateAvailable =
+        result.updateInfo && result.updateInfo.version !== app.getVersion();
+      console.log(
+        'Update tersedia:',
+        updateAvailable,
+        'Versi terbaru:',
+        result.updateInfo ? result.updateInfo.version : 'N/A'
+      );
       mainWindow.webContents.send('fe-update-status', {
         updateAvailable,
-        version: result.updateInfo.version,
-        // Kamu juga dapat menyertakan data lain dari updateInfo jika diperlukan
-      })
+        version: result.updateInfo ? result.updateInfo.version : null,
+      });
     } catch (error) {
+      console.error('Error saat mengecek update FE:', error);
       mainWindow.webContents.send('fe-update-status', {
         updateAvailable: false,
-        error: error.message
-      })
+        error: error.message,
+      });
     }
-  })
+  });
+  
 
   // Kirim progress download update FE ke renderer
   autoUpdater.on('download-progress', (progressObj) => {
