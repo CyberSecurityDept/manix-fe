@@ -12,7 +12,7 @@ import backIcon from '../assets/back-Icon.svg'
 const OTA = () => {
   const BASE_URL = import.meta.env.VITE_BASE_URL
   const UPDATE_URL = '/v1/update-version'
-  const CHECK_URL = '/v1/check-update'
+  const CHECK_URL = '/v1/check-update-app'
   const LIST_VERSION_URL = '/v1/list-version' // endpoint list version
 
   const navigate = useNavigate()

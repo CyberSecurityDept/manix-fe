@@ -444,7 +444,7 @@ const ResultFullScanPage = () => {
                   </span>
                   <button
                     className="text-teal-400 underline"
-                    onClick={() => handleViewClick('Application')}
+                    onClick={() => handleViewClick('Applications')}
                   >
                     View
                   </button>
@@ -465,7 +465,7 @@ const ResultFullScanPage = () => {
                   </span>
                   <button
                     className="text-teal-400 underline"
-                    onClick={() => handleViewClick('Document')}
+                    onClick={() => handleViewClick('Documents')}
                   >
                     View
                   </button>
@@ -527,9 +527,9 @@ const ResultFullScanPage = () => {
                   </span>{' '}
                   <button
                     className="ml-4 text-teal-400 underline"
-                    onClick={() => handleViewClick('Application')}
+                    onClick={() => handleViewClick('Applications')}
                     style={{
-                      color: selectedView === 'Application' ? '#05564F' : '#4FD1C5'
+                      color: selectedView === 'Applications' ? '#05564F' : '#4FD1C5'
                     }}
                   >
                     View
@@ -545,9 +545,9 @@ const ResultFullScanPage = () => {
                   </span>{' '}
                   <button
                     className="ml-4 text-teal-400 underline"
-                    onClick={() => handleViewClick('Document')}
+                    onClick={() => handleViewClick('Documents')}
                     style={{
-                      color: selectedView === 'Document' ? '#05564F' : '#4FD1C5'
+                      color: selectedView === 'Documents' ? '#05564F' : '#4FD1C5'
                     }}
                   >
                     View
@@ -616,7 +616,7 @@ const ResultFullScanPage = () => {
                 </label>
               </div>
             </div>
-            <div className="space-y-[1px]">
+            <div className="space-y-[1px] max-h-[300px] overflow-y-auto">
               {filteredThreats.length > 0 ? (
                 filteredThreats.map((threat, index) => (
                   <div
