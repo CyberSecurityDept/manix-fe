@@ -73,7 +73,7 @@ const OTA = () => {
           className="w-[403px] h-[123px] bg-cover bg-no-repeat border border-[#05564F] flex flex-col justify-center items-center bg-gradient-to-b from-[#0C1E1B] to-[#0C1612]"
           style={{ backgroundImage: `url(${Border})` }}
         >
-          <h2 className="text-white text-lg mb-2">APP V1.1.0.0</h2>
+          <h2 className="text-white text-lg mb-2">APP V1.1.0.1</h2>
           <button
             onClick={checkAPPUpdate}
             className="text-white py-1 px-4"
