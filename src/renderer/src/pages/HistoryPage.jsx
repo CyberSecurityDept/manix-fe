@@ -98,6 +98,20 @@ const HistoryPage = () => {
     )
   })
 
+  // Tambahkan fungsi handleDetail
+  const handleDetail = (item) => {
+    // Misal scan_id: "Power51280003007_18022025_165044"
+    const [serialNumber, ...timeParts] = item.scan_id.split('_')
+    const timeStamp = timeParts.join('_')
+    
+    if (item.scan_type === 'full-scan') {
+      navigate(`/history-detail/full-scan/${serialNumber}/${timeStamp}`)
+    } else if (item.scan_type === 'fast-scan') {
+      navigate(`/history-detail/fast-scan/${serialNumber}/${timeStamp}`)
+    }
+  }
+  
+
   // Pagination
   const totalPages = Math.ceil(filteredData.length / itemsPerPage)
   const currentData = filteredData.slice(
@@ -254,7 +268,7 @@ const HistoryPage = () => {
                         <td className="p-2 text-center">
                           <button
                             className="bg-[#064039] border border-teal-400 px-4 py-1"
-                            onClick={() => navigate(`/result-fast-scan/${item.scan_id}`)}
+                            onClick={() => handleDetail(item)}
                           >
                             DETAIL
                           </button>

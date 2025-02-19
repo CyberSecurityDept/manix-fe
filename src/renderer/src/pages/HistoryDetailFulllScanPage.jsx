@@ -1,13 +1,7 @@
 import { useState, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import '../styles/Checkbox.css'
-import { Link } from 'react-router-dom'
-import { useNavigate } from 'react-router-dom'
 import bgImage from '../assets/bg-darkmode.png'
-import RemoveModal from '../components/modal/Delete'
-import RiskModal from '../components/modal/Risk'
-import CompleteModal from '../components/modal/Complete'
-import AfterCompleteModal from '../components/modal/AfterComplete'
-import DeleteProgressModal from '../components/modal/DeleteProgress'
 import deviceImage from '../assets/samsung galaxy s24 ultra 5g sm s928 0.jpg'
 import overview from '../assets/border/overview-section.svg'
 import viewSection from '../assets/border/view-section.svg'
@@ -16,79 +10,40 @@ import bgBorder from '../assets/border/overview-border.svg'
 import bgGood from '../assets/border/percentage-good.svg'
 import bgAverage from '../assets/border/percentage-average.svg'
 import bgBad from '../assets/border/percentage-bad.svg'
-import removeButtonImage from '../assets/border/remove-button.svg'
-import completeScanButton from '../assets/border/complete-scan.svg'
 import plusSign from '../assets/plus-sign.svg'
 import backIcon from '../assets/back-Icon.svg'
 
-const HistoryDetailPage = () => {
+const BASE_URL = import.meta.env.VITE_BASE_URL
+
+const HistoryDetailFullScanPage = () => {
   const navigate = useNavigate()
+  const { serialNumber, timeStamp } = useParams()
 
-  // State for Remove Modal
-  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false)
+  // State untuk data detail endpoint
+  const [detailData, setDetailData] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-  // State for Risk Modal
+  // State untuk daftar threats
+  const [threats, setThreats] = useState([])
+  const [threatSortConfig, setThreatSortConfig] = useState({
+    key: null,
+    direction: 'ascending'
+  })
+
+  // State untuk toggle tampilan overview vs. list threat
+  const [selectedView, setSelectedView] = useState(null)
+  const [showView, setShowView] = useState(false)
+  const [beforePercentage, setBeforePercentage] = useState(null)
   const [isRiskModalOpen, setIsRiskModalOpen] = useState(false)
   const [selectedRiskData, setSelectedRiskData] = useState(null)
 
-  // State for Complete Scan Modal
-  const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false)
-
-  // State for After Complete Modal
-  const [isAfterCompleteModalOpen, setIsAfterCompleteModalOpen] = useState(false)
-
-  // State for Delete Progress Modal
-  const [isProgressModalOpen, setIsProgressModalOpen] = useState(false)
-
-  const [selectedView, setSelectedView] = useState(null)
-  const [showView, setShowView] = useState(false)
-  const [selectAll, setSelectAll] = useState(false)
-  const [checkedItems, setCheckedItems] = useState([false, false, false, false, false])
-  const [beforePercentage, setBeforePercentage] = useState(null)
-
-  const scanPercentage = 89
-  const lastScanPercentage = 89
-
-  // Handlers for Remove Modal
-  const openRemoveModal = () => setIsRemoveModalOpen(true)
-  const closeRemoveModal = () => setIsRemoveModalOpen(false)
-
-  //   const openRiskModal = (risk) => {
-  //     // Simulasikan data risiko berdasarkan nilai risk
-  //     const riskData = {
-  //       risk: risk, // Gunakan nilai risk dari item
-  //       maliciousCount: 5, // Contoh data
-  //       commonCount: 16, // Contoh data
-  //       details: [
-  //         {
-  //           title: 'Android.permission.INTERNET',
-  //           description:
-  //             'Malware can send your personal data to external servers without your knowledge.'
-  //         }
-  //         // Tambahkan detail lainnya
-  //       ]
-  //     }
-  //     setSelectedRiskData(riskData) // Simpan data risiko
-  //     setIsRiskModalOpen(true) // Buka modal
-  //   }
-
+  // Fungsi untuk menutup modal risiko (jika diperlukan)
   const closeRiskModal = () => {
-    setIsRiskModalOpen(false) // Tutup modal
-    setSelectedRiskData(null) // Bersihkan data risiko
+    setIsRiskModalOpen(false)
+    setSelectedRiskData(null)
   }
 
-  // Fungsi untuk buka Complete Scan Modal
-  const openCompleteModal = () => setIsCompleteModalOpen(true)
-
-  // Fungsi untuk tutup Complete Modal dan buka After Complete Modal
-  const handleCompleteConfirm = () => {
-    setIsCompleteModalOpen(false) // Tutup modal Complete
-    setIsAfterCompleteModalOpen(true) // Buka modal After Complete
-  }
-
-  // Tutup modal AfterComplete
-  const closeAfterCompleteModal = () => setIsAfterCompleteModalOpen(false)
-
+  // Fungsi untuk menentukan style berdasarkan persentase
   const getPercentageStyle = (percentage) => {
     if (percentage >= 90 && percentage <= 98) {
       return {
@@ -111,9 +66,39 @@ const HistoryDetailPage = () => {
     }
   }
 
+  // Fetch data detail full-scan
+  useEffect(() => {
+    const fetchDetail = async () => {
+      setIsLoading(true)
+      try {
+        const endpoint = `${BASE_URL}/v1/history-fullscan-detail/full-scan/${serialNumber}/${timeStamp}`
+        const response = await fetch(endpoint)
+        const data = await response.json()
+        setDetailData(data)
+        if (data && data.threats) {
+          setThreats(data.threats)
+        }
+      } catch (error) {
+        console.error('Error fetching detail data:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchDetail()
+  }, [serialNumber, timeStamp])
+
+  // Konversi nilai persentase (misalnya "50.00%") menjadi angka
+  const scanPercentage = detailData
+    ? parseFloat(detailData.security_percentage.replace('%', ''))
+    : 0
+  const lastScanPercentage = detailData
+    ? parseFloat(detailData.last_scan_percentage.replace('%', ''))
+    : 0
+
   const percentageStyle = getPercentageStyle(scanPercentage)
   const lastPercentageStyle = getPercentageStyle(lastScanPercentage)
 
+  // Fungsi toggle tampilan overview vs. daftar threat
   const handleViewClick = (viewType) => {
     if (selectedView === viewType) {
       setSelectedView(null)
@@ -124,69 +109,56 @@ const HistoryDetailPage = () => {
     }
   }
 
-  const handleSelectAllChange = () => {
-    const newSelectAll = !selectAll
-    setSelectAll(newSelectAll)
-    setCheckedItems(checkedItems.map(() => newSelectAll))
-  }
-
-  const handleCheckboxChange = (index) => {
-    const newCheckedItems = [...checkedItems]
-    newCheckedItems[index] = !newCheckedItems[index]
-    setCheckedItems(newCheckedItems)
-    setSelectAll(newCheckedItems.every((item) => item === true))
-  }
-
-  const handleRemoveScanning = () => {
-    // Logic when removing items
-    setIsRemoveModalOpen(false) // Close modal after confirming
-    setIsProgressModalOpen(true)
-  }
-
-  const handleProgressComplete = () => {
-    setIsProgressModalOpen(false)
-    setBeforePercentage(lastScanPercentage)
-  }
-
-  // State untuk menyimpan data items
-  const [items, setItems] = useState([
-    { id: 1, date: '2024-07-05', name: 'msexcel.exe', risk: '80%', selected: false },
-    { id: 2, date: '2024-07-06', name: 'msoffice.exe', risk: '80%', selected: false },
-    { id: 3, date: '2024-07-09', name: 'msoffice.exe', risk: '80%', selected: false },
-    { id: 4, date: '2024-07-20', name: 'msexcel.exe', risk: '80%', selected: false }
-  ])
-
-  // State untuk sorting
-  const [sortConfig, setSortConfig] = useState({
-    key: null,
-    direction: 'ascending'
-  })
-
-  // Fungsi untuk sorting
-  const handleSort = (key) => {
+  // Fungsi sorting untuk daftar threats
+  const handleThreatSort = (key) => {
     let direction = 'ascending'
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+    if (threatSortConfig.key === key && threatSortConfig.direction === 'ascending') {
       direction = 'descending'
     }
-    setSortConfig({ key, direction })
-
-    const sortedItems = [...items].sort((a, b) => {
-      if (a[key] < b[key]) return direction === 'ascending' ? -1 : 1
-      if (a[key] > b[key]) return direction === 'ascending' ? 1 : -1
+    setThreatSortConfig({ key, direction })
+    const sorted = [...threats].sort((a, b) => {
+      // Jika key adalah "date", gunakan properti "date_time"
+      const field = key === 'date' ? 'date_time' : key
+      if (a[field] < b[field]) return direction === 'ascending' ? -1 : 1
+      if (a[field] > b[field]) return direction === 'ascending' ? 1 : -1
       return 0
     })
-    setItems(sortedItems)
+    setThreats(sorted)
   }
 
-  useEffect(() => {
-    if (beforePercentage !== null) {
-      console.log('Before percentage updated:', beforePercentage)
-    }
-  }, [beforePercentage])
+  if (isLoading) {
+    return (
+      <div
+        className="h-screen w-screen flex justify-center items-center text-white font-aldrich"
+        style={{
+          backgroundImage: `url(${bgImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
+        <p>Loading...</p>
+      </div>
+    )
+  }
+
+  if (!detailData) {
+    return (
+      <div
+        className="h-screen w-screen flex justify-center items-center text-white font-aldrich"
+        style={{
+          backgroundImage: `url(${bgImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
+        <p>Data tidak ditemukan</p>
+      </div>
+    )
+  }
 
   return (
     <div
-      className={`h-screen w-screen flex flex-col justify-center items-center relative font-aldrich`}
+      className="h-screen w-screen flex flex-col justify-center items-center relative font-aldrich"
       style={{
         backgroundImage: `url(${bgImage})`,
         backgroundSize: 'cover',
@@ -227,7 +199,9 @@ const HistoryDetailPage = () => {
           }}
         >
           <div className="flex flex-col items-center justify-center">
-            <h2 className="text-[52px] leading-none">{scanPercentage}%</h2>
+            <h2 className="text-[52px] leading-none">
+              {detailData.security_percentage}
+            </h2>
             <p className="text-[18px]" style={{ color: percentageStyle.color }}>
               {percentageStyle.label}
             </p>
@@ -243,26 +217,27 @@ const HistoryDetailPage = () => {
       {/* Security Patch, Phone Model, Last Scan Percentage Card */}
       <div
         className="relative w-[1001px] h-[89px] bg-opacity-90 shadow-inner text-center mb-1 p-6"
-        style={{
-          backgroundImage: `url(${bgModel})`
-        }}
+        style={{ backgroundImage: `url(${bgModel})` }}
       >
-        {/* Plus Sign */}
-        <img src={plusSign} alt="Plus Sign" className="absolute top-[-12px] left-[-12px] w-6 h-6" />
         <img
           src={plusSign}
           alt="Plus Sign"
-          className="absolute bottom-[-12px] right-[-12px] w-6 h-6 "
+          className="absolute top-[-12px] left-[-12px] w-6 h-6"
+        />
+        <img
+          src={plusSign}
+          alt="Plus Sign"
+          className="absolute bottom-[-12px] right-[-12px] w-6 h-6"
         />
 
         <div className="grid grid-cols-3 gap-4 text-white">
           <div>
             <p className="font-semibold text-gray-400">Security Patch</p>
-            <p className="text-gray-100 mt-1">2024-08-05</p>
+            <p className="text-gray-100 mt-1">{detailData.security_patch}</p>
           </div>
           <div>
             <p className="font-semibold text-gray-400">Phone Model</p>
-            <p className="text-gray-100 mt-1">Samsung S24 PRO</p>
+            <p className="text-gray-100 mt-1">{detailData.model}</p>
           </div>
           <div>
             <p className="font-semibold text-gray-400">Last Scan Percentage</p>
@@ -270,12 +245,13 @@ const HistoryDetailPage = () => {
               className="text-green-400 mt-1 font-bold"
               style={{ color: lastPercentageStyle.color }}
             >
-              {lastScanPercentage}% {lastPercentageStyle.label}
+              {detailData.last_scan_percentage} {lastPercentageStyle.label}
             </p>
           </div>
         </div>
       </div>
 
+      {/* Tampilan Overview / Detail Threat */}
       {!showView ? (
         <div
           className="w-[1000px] h-[450px] p-6 mt-4 shadow-lg text-white bg-opacity-90 relative"
@@ -292,11 +268,17 @@ const HistoryDetailPage = () => {
             className="absolute bottom-[-12px] right-[-12px] w-6 h-6"
           />
 
-          <h3 className="text-2xl font-semibold text-gray-100 mb-6 text-center">Overview</h3>
+          <h3 className="text-2xl font-semibold text-gray-100 mb-6 text-center">
+            Overview
+          </h3>
 
           <div className="grid grid-cols-7">
             <div className="col-span-3 flex justify-center items-center">
-              <img src={deviceImage} alt="Phone Model" className="w-[259px] h-auto" />
+              <img
+                src={deviceImage}
+                alt="Phone Model"
+                className="w-[259px] h-auto"
+              />
             </div>
 
             <div className="col-span-4 space-y-4 p-6">
@@ -305,8 +287,8 @@ const HistoryDetailPage = () => {
                 <span className="text-gray-100">:</span>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-100">
-                    <span className="text-red-400">1</span>/
-                    <span className="text-gray-100">83</span>
+                    {detailData.scan_overview.applications.threats}/
+                    {detailData.scan_overview.applications.scanned}
                   </span>
                   <button
                     className="text-teal-400 underline"
@@ -322,26 +304,30 @@ const HistoryDetailPage = () => {
                 <span className="text-gray-100">:</span>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-100">
-                    <span className="text-red-400">42</span>/{' '}
-                    <span className="text-gray-100">20581</span>
+                    {detailData.scan_overview.documents.threats}/
+                    {detailData.scan_overview.documents.scanned}
                   </span>
                   <button
                     className="text-teal-400 underline"
-                    onClick={() => handleViewClick('Document')}
+                    onClick={() => handleViewClick('Documents')}
                   >
                     View
                   </button>
                 </div>
               </div>
 
+              {/* Label "Media" sebagai pengganti "Accessibility" */}
               <div className="grid grid-cols-3 gap-4 items-center">
-                <span className="font-medium text-[#E6FFFD]">Accessibility</span>
+                <span className="font-medium text-[#E6FFFD]">Media</span>
                 <span className="text-gray-100">:</span>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-100">32</span>
+                  <span className="text-gray-100">
+                    {detailData.scan_overview.media.threats}/
+                    {detailData.scan_overview.media.scanned}
+                  </span>
                   <button
                     className="text-teal-400 underline"
-                    onClick={() => handleViewClick('Accessibility')}
+                    onClick={() => handleViewClick('Media')}
                   >
                     View
                   </button>
@@ -352,7 +338,10 @@ const HistoryDetailPage = () => {
                 <span className="font-medium text-[#E6FFFD]">Installer</span>
                 <span className="text-gray-100">:</span>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-100">32</span>
+                  <span className="text-gray-100">
+                    {detailData.scan_overview.installer.threats}/
+                    {detailData.scan_overview.installer.scanned}
+                  </span>
                   <button
                     className="text-teal-400 underline"
                     onClick={() => handleViewClick('Installer')}
@@ -366,22 +355,15 @@ const HistoryDetailPage = () => {
 
               <div className="flex justify-between items-center">
                 <span className="font-medium text-[#E6FFFD]">Threat</span>
-                <span className="text-red-500 font-bold ">43 Threat</span>
+                <span className="text-red-500 font-bold ">
+                  {detailData.total_threats} Threat
+                </span>
               </div>
             </div>
           </div>
-
-          <div className="mt-16 text-center">
-            <p className="text-[#E6FFFD]">
-              Previous scan history found on this device. Would you like to view{' '}
-              <Link to="/history" className="text-teal-400 underline">
-                History
-              </Link>
-              ?
-            </p>
-          </div>
         </div>
       ) : (
+        // Tampilan list Threat (View) ketika tombol View ditekan
         <div className="flex space-x-6 mt-4 w-[1001px]">
           <div
             className="w-[347px] h-[450px] p-4 text-white"
@@ -397,7 +379,10 @@ const HistoryDetailPage = () => {
               <div className="flex justify-between items-center">
                 <span className="text-[#E6FFFD]">Application :</span>
                 <div className="flex items-center">
-                  <span className="text-gray-100">1/83</span>
+                  <span className="text-gray-100">
+                    {detailData.scan_overview.applications.threats}/
+                    {detailData.scan_overview.applications.scanned}
+                  </span>
                   <button
                     className="ml-4 text-teal-400 underline"
                     onClick={() => handleViewClick('Application')}
@@ -412,12 +397,15 @@ const HistoryDetailPage = () => {
               <div className="flex justify-between items-center">
                 <span className="text-[#E6FFFD]">Document :</span>
                 <div className="flex items-center">
-                  <span className="text-gray-100">0/23051</span>
+                  <span className="text-gray-100">
+                    {detailData.scan_overview.documents.threats}/
+                    {detailData.scan_overview.documents.scanned}
+                  </span>
                   <button
                     className="ml-4 text-teal-400 underline"
-                    onClick={() => handleViewClick('Document')}
+                    onClick={() => handleViewClick('Documents')}
                     style={{
-                      color: selectedView === 'Document' ? '#05564F' : '#4FD1C5'
+                      color: selectedView === 'Documents' ? '#05564F' : '#4FD1C5'
                     }}
                   >
                     View
@@ -425,14 +413,17 @@ const HistoryDetailPage = () => {
                 </div>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-[#E6FFFD]">Accessibility :</span>
+                <span className="text-[#E6FFFD]">Media :</span>
                 <div className="flex items-center">
-                  <span className="text-gray-100">1/83</span>
+                  <span className="text-gray-100">
+                    {detailData.scan_overview.media.threats}/
+                    {detailData.scan_overview.media.scanned}
+                  </span>
                   <button
                     className="ml-4 text-teal-400 underline"
-                    onClick={() => handleViewClick('Accessibility')}
+                    onClick={() => handleViewClick('Media')}
                     style={{
-                      color: selectedView === 'Accessibility' ? '#05564F' : '#4FD1C5'
+                      color: selectedView === 'Media' ? '#05564F' : '#4FD1C5'
                     }}
                   >
                     View
@@ -442,7 +433,10 @@ const HistoryDetailPage = () => {
               <div className="flex justify-between items-center">
                 <span className="text-[#E6FFFD]">Installer :</span>
                 <div className="flex items-center">
-                  <span className="text-gray-100">1/83</span>
+                  <span className="text-gray-100">
+                    {detailData.scan_overview.installer.threats}/
+                    {detailData.scan_overview.installer.scanned}
+                  </span>
                   <button
                     className="ml-4 text-teal-400 underline"
                     onClick={() => handleViewClick('Installer')}
@@ -456,12 +450,12 @@ const HistoryDetailPage = () => {
               </div>
               <div className="flex justify-between items-center mt-4 border-t border-gray-700 pt-4">
                 <span className="text-[#E6FFFD]">Threat :</span>
-                <span className="text-gray-100">0/20581</span>
+                <span className="text-gray-100">{detailData.total_threats}</span>
               </div>
             </div>
           </div>
 
-          {/* Right Side: View */}
+          {/* Right Side: Tabel Threats */}
           <div
             className="w-[630px] h-[450px] p-4 bg-gray-800 text-white relative"
             style={{
@@ -471,124 +465,46 @@ const HistoryDetailPage = () => {
               backgroundRepeat: 'no-repeat'
             }}
           >
-            <h3 className="text-2xl font-semibold mb-4">{selectedView || 'View'}</h3>
+            <h3 className="text-2xl font-semibold mb-4">
+              {selectedView ? selectedView : 'Threats'}
+            </h3>
             <div className="w-full bg-[#00B3A2] grid grid-cols-12 p-2 items-center text-sm text-black">
               <div
                 className="col-span-5 flex items-center gap-1 cursor-pointer"
-                onClick={() => handleSort('date')}
+                onClick={() => handleThreatSort('date')}
               >
                 Date Time <span>↓</span>
               </div>
               <div
                 className="col-span-5 flex items-center gap-1 cursor-pointer"
-                onClick={() => handleSort('name')}
+                onClick={() => handleThreatSort('name')}
               >
                 Name <span>↓</span>
               </div>
-              <div className="col-span-2 flex justify-end">
-                {/* Checkbox for select all */}
-                <label className="checkbox-container">
-                  <input
-                    type="checkbox"
-                    className="custom-checkbox select-all"
-                    onChange={handleSelectAllChange}
-                    checked={selectAll}
-                  />
-                  <span className="checkmark"></span>
-                </label>
-              </div>
             </div>
-            <div className="space-y-1">
-              {[...Array(5)].map((_, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-3 border-b border-[#EAECF0] p-2 text-white"
-                >
-                  <span>2024-07-06</span>
-                  <div className="flex justify-center items-center">
-                    <span>msoffice.exe</span>
+            <div className="space-y-1 mt-2">
+              {threats.length > 0 ? (
+                threats.map((threat, index) => (
+                  <div
+                    key={index}
+                    className="grid grid-cols-3 border-b border-[#EAECF0] p-2 text-white"
+                  >
+                    <span>{new Date(threat.date_time).toLocaleString()}</span>
+                    <div className="flex justify-center items-center">
+                      <span>{threat.name}</span>
+                    </div>
                   </div>
-                  <div className="flex items-end justify-end">
-                    {/* Checkbox at table */}
-                    <label className="checkbox-container">
-                      <input
-                        type="checkbox"
-                        className="custom-checkbox"
-                        checked={checkedItems[index]}
-                        onChange={() => handleCheckboxChange(index)}
-                      />
-                      <span className="checkmark"></span>
-                    </label>
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-center">No threat data available.</p>
+              )}
             </div>
             <div className="border-b border-gray-400 mt-7 mb-5"></div>
-            <div className="text-right mb-3">
-              <button
-                className="w-[267px] h-[43px] bg-transparent text-white font-bold relative overflow-hidden"
-                style={{
-                  backgroundImage: `url(${removeButtonImage})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
-                }}
-                onClick={openRemoveModal} // Open modal on click
-              >
-                <span className="relative z-10">DELETE</span>
-                <div className="absolute inset-0 bg-red-900 opacity-0 hover:opacity-30 transition-opacity"></div>
-              </button>
-            </div>
-            {/* Remove Modal */}
-            {isRemoveModalOpen && (
-              <RemoveModal
-                onClose={closeRemoveModal}
-                onConfirm={handleRemoveScanning}
-                onProgressComplete={handleProgressComplete}
-              />
-            )}
-            {/* Modal untuk Progress Hapus */}
-            {isProgressModalOpen && (
-              <DeleteProgressModal
-                onClose={() => setIsProgressModalOpen(false)}
-                onProgressComplete={handleProgressComplete} // Pastikan ini adalah fungsi dan diteruskan dengan benar
-              />
-            )}
-            {/* Risk Modal */}
-            <RiskModal
-              isOpen={isRiskModalOpen}
-              onClose={closeRiskModal}
-              riskData={selectedRiskData}
-            />{' '}
           </div>
         </div>
       )}
-
-      <div className="mt-4">
-        <button
-          className="w-[389px] h-[64px] bg-transparent text-white font-bold"
-          style={{
-            backgroundImage: `url(${completeScanButton})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}
-          onClick={openCompleteModal}
-        >
-          COMPLETE SCAN
-        </button>
-
-        {/* Complete Modal */}
-        {isCompleteModalOpen && (
-          <CompleteModal
-            onClose={() => setIsCompleteModalOpen(false)}
-            onConfirm={handleCompleteConfirm}
-          />
-        )}
-
-        {/* After Complete Modal */}
-        {isAfterCompleteModalOpen && <AfterCompleteModal onClose={closeAfterCompleteModal} />}
-      </div>
     </div>
   )
 }
 
-export default HistoryDetailPage
+export default HistoryDetailFullScanPage

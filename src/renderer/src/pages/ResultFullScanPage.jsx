@@ -428,7 +428,7 @@ const ResultFullScanPage = () => {
                 <p className="text-white">Loading image...</p>
               )}
             </div>
-            <div className="col-span-4 space-y-9 p-6">
+            <div className="col-span-4 space-y-6 p-6">
               <div className="grid grid-cols-3 gap-4 items-center">
                 <span className="font-medium text-[#E6FFFD]">Application</span>
                 <span className="text-[#E6FFFD]">:</span>
@@ -444,7 +444,7 @@ const ResultFullScanPage = () => {
                   </span>
                   <button
                     className="text-teal-400 underline"
-                    onClick={() => handleViewClick('Applications')}
+                    onClick={() => handleViewClick('Application')}
                   >
                     View
                   </button>
@@ -466,6 +466,27 @@ const ResultFullScanPage = () => {
                   <button
                     className="text-teal-400 underline"
                     onClick={() => handleViewClick('Documents')}
+                  >
+                    View
+                  </button>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-4 items-center">
+                <span className="font-medium text-[#E6FFFD]">Media</span>
+                <span className="text-[#E6FFFD]">:</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-[#E6FFFD]">
+                    <span className="text-[#D3351D]">
+                      {resultData?.scan_overview.media.threats || 0}
+                    </span>{' '}
+                    /{' '}
+                    <span className="text-[#E6FFFD]">
+                      {resultData?.scan_overview.media.scanned || 0}
+                    </span>
+                  </span>
+                  <button
+                    className="text-teal-400 underline"
+                    onClick={() => handleViewClick('Media')}
                   >
                     View
                   </button>
@@ -517,7 +538,7 @@ const ResultFullScanPage = () => {
             }}
           >
             <h3 className="text-2xl font-semibold mb-10">Overview</h3>
-            <div className="space-y-14">
+            <div className="space-y-10">
               <div className="flex justify-between items-center">
                 <span className="text-[#E6FFFD]">Application :</span>
                 <div className="flex items-center">
@@ -527,9 +548,9 @@ const ResultFullScanPage = () => {
                   </span>{' '}
                   <button
                     className="ml-4 text-teal-400 underline"
-                    onClick={() => handleViewClick('Applications')}
+                    onClick={() => handleViewClick('Application')}
                     style={{
-                      color: selectedView === 'Applications' ? '#05564F' : '#4FD1C5'
+                      color: selectedView === 'Application' ? '#05564F' : '#4FD1C5'
                     }}
                   >
                     View
@@ -548,6 +569,24 @@ const ResultFullScanPage = () => {
                     onClick={() => handleViewClick('Documents')}
                     style={{
                       color: selectedView === 'Documents' ? '#05564F' : '#4FD1C5'
+                    }}
+                  >
+                    View
+                  </button>
+                </div>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-[#E6FFFD]">Media :</span>
+                <div className="flex items-center">
+                  <span className="text-[#E6FFFD]">
+                    {resultData?.scan_overview?.media?.threats || 0}/
+                    {resultData?.scan_overview?.media?.scanned || 0}
+                  </span>{' '}
+                  <button
+                    className="ml-4 text-teal-400 underline"
+                    onClick={() => handleViewClick('Media')}
+                    style={{
+                      color: selectedView === 'Media' ? '#05564F' : '#4FD1C5'
                     }}
                   >
                     View
@@ -616,7 +655,7 @@ const ResultFullScanPage = () => {
                 </label>
               </div>
             </div>
-            <div className="space-y-[1px] max-h-[300px] overflow-y-auto">
+            <div className="space-y-[1px] max-h-[250px] overflow-y-auto">
               {filteredThreats.length > 0 ? (
                 filteredThreats.map((threat, index) => (
                   <div
