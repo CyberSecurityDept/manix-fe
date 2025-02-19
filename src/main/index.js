@@ -59,7 +59,9 @@ function createWindow() {
   // --- Integrasi electron-updater untuk FE ---
   ipcMain.on('start-fe-update', async () => {
     try {
+      console.log(app.getVersion())
       const result = await autoUpdater.checkForUpdates()
+      console.log('Memeriksa pembaruan...')
       // Misal, jika update tersedia:
       const updateAvailable = result.updateInfo && result.updateInfo.version !== app.getVersion()
       mainWindow.webContents.send('fe-update-status', {
