@@ -80,6 +80,13 @@ const SearchDevicePage = () => {
         <h2 className="text-2xl font-bold font-aldrich">Checking connection...</h2>
         <p className="text-gray-300 mt-2 font-aldrich">Please wait...</p>
       </div>
+            {/* OTA Button */}
+            <button
+        className="absolute bottom-[52px] right-[52px] flex items-center justify-center w-[143px] h-[50px] bg-[#091817] text-sm font-bold text-white border border-[#4FD1C5] hover:bg-teal-700 font-roboto"
+        onClick={() => navigate('/ota')}
+      >
+        <span>OTA</span>
+      </button>
     </div>
   );
 };
