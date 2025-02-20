@@ -7,6 +7,7 @@ import plusSign from '../assets/plus-sign.svg'
 import bgGood from '../assets/border/percentage-good.svg'
 import bgAverage from '../assets/border/percentage-average.svg'
 import bgBad from '../assets/border/percentage-bad.svg'
+import backIcon from '../assets/back-Icon.svg'
 
 // Mengambil BASE_URL dari environment variables
 const BASE_URL = import.meta.env.VITE_BASE_URL
@@ -134,6 +135,19 @@ const HistoryDetailFastScanPage = () => {
       className="h-screen w-screen flex flex-col justify-center items-center relative font-aldrich"
       style={{ backgroundImage: `url(${bgImage})`, backgroundSize: 'cover' }}
     >
+      {/* Tombol Back */}
+      <button
+        className="absolute top-6 left-6 flex items-center justify-center focus:outline-none group transition-all duration-300"
+        onClick={() => navigate('/history')}
+        style={{
+          width: '68px',
+          height: '68px',
+          backgroundColor: 'transparent'
+        }}
+      >
+        <img src={backIcon} alt="Back Icon" className="w-10 h-10" />
+      </button>
+
       {/* Security Percentage Section */}
       <div className="flex flex-col items-center justify-center space-y-2 relative">
         <h2 className="text-4xl font-bold text-white">Security Percentage</h2>
@@ -269,9 +283,7 @@ const HistoryDetailFastScanPage = () => {
                     className="w-full grid grid-cols-12 p-2 items-center border-b border-[#1A1A1A] text-white"
                   >
                     <div className="col-span-5">
-                      {threat.date_time
-                        ? new Date(threat.date_time).toLocaleString()
-                        : '-'}
+                      {threat.date_time ? new Date(threat.date_time).toLocaleString() : '-'}
                     </div>
                     <div className="flex items-center col-span-7 justify-between">
                       <div className="flex items-center gap-4">
