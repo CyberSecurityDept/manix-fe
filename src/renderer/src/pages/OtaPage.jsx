@@ -87,7 +87,6 @@ const OTA = () => {
           if (data.current_tag !== data.latest_remote_tag || feStatus.updateAvailable) {
             setIsNewVersionModalOpen(true)
           } else {
-            alert('Aplikasi sudah versi terbaru.')
           }
         })
       } else {

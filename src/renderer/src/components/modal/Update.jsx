@@ -6,20 +6,31 @@ const UpdateModal = ({ onClose, updateData }) => {
   const [progress, setProgress] = useState(0)
 
   useEffect(() => {
-    // Jika updateData sudah ada, periksa kondisi update_available
     if (updateData) {
-      if (updateData.update_available === false) {
+      // Cek apakah respon berasal dari app box (misalnya memiliki current_tag)
+      if (updateData.current_tag !== undefined && updateData.latest_remote_tag !== undefined) {
+        const appUpToDate = updateData.current_tag === updateData.latest_remote_tag
         setProgress(100)
         const timeout = setTimeout(() => {
           onClose()
-        }, 1000)
+        }, appUpToDate ? 1000 : 300)
         return () => clearTimeout(timeout)
-      } else if (updateData.update_available === true) {
-        setProgress(100)
-        const timeout = setTimeout(() => {
-          onClose()
-        }, 300)
-        return () => clearTimeout(timeout)
+      }
+      // Jika respon berasal dari cyber box (menggunakan update_available)
+      if (updateData.update_available !== undefined) {
+        if (updateData.update_available === false) {
+          setProgress(100)
+          const timeout = setTimeout(() => {
+            onClose()
+          }, 1000)
+          return () => clearTimeout(timeout)
+        } else if (updateData.update_available === true) {
+          setProgress(100)
+          const timeout = setTimeout(() => {
+            onClose()
+          }, 300)
+          return () => clearTimeout(timeout)
+        }
       }
     }
 
@@ -62,7 +73,6 @@ const UpdateModal = ({ onClose, updateData }) => {
           <ArrowPattern progress={progress} />
         </div>
 
-        {/* Tampilkan pesan sesuai kondisi */}
         {updateData ? (
           <p className="text-[#00FFE7] text-3xl mt-10">Checking for updates...</p>
         ) : (
