@@ -6,34 +6,52 @@ const UpdateModal = ({ onClose, updateData }) => {
   const [progress, setProgress] = useState(0)
 
   useEffect(() => {
+    // Jika updateData sudah ada, periksa kondisi update_available
+    if (updateData) {
+      if (updateData.update_available === false) {
+        setProgress(100)
+        const timeout = setTimeout(() => {
+          onClose()
+        }, 1000)
+        return () => clearTimeout(timeout)
+      } else if (updateData.update_available === true) {
+        setProgress(100)
+        const timeout = setTimeout(() => {
+          onClose()
+        }, 300)
+        return () => clearTimeout(timeout)
+      }
+    }
+
+    // Jika updateData belum ada, naikkan progress secara periodik
     const interval = setInterval(() => {
       setProgress((prevProgress) => {
         const newProgress = prevProgress + 10
-
-        // Hentikan interval dan panggil onClose setelah mencapai 100%
         if (newProgress >= 100) {
           clearInterval(interval)
           setTimeout(() => {
-            onClose() // Panggil onClose setelah rendering selesai
+            onClose()
           }, 0)
+          return 100
         }
-
-        return Math.min(newProgress, 100)
+        return newProgress
       })
     }, 1000)
 
-    return () => clearInterval(interval) // Bersihkan interval saat komponen unmount
-  }, [onClose])
+    return () => clearInterval(interval)
+  }, [updateData, onClose])
 
   return (
     <div
       className="fixed inset-0 flex items-center justify-center z-50 font-aldrich backdrop-blur-md"
-      style={{
-        background: 'rgba(0, 0, 0, 0.8)'
-      }}
+      style={{ background: 'rgba(0, 0, 0, 0.8)' }}
     >
       <div className="relative w-[801px] h-[305px] border-2 border-y-[#0C9A8D] border-x-[#05564F] bg-gradient-to-b from-[#091817] to-[#0C1612] flex flex-col items-center justify-center p-8">
-        <img src={plusSign} alt="Plus Sign" className="absolute top-[-13px] left-[-13px] w-6 h-6" />
+        <img
+          src={plusSign}
+          alt="Plus Sign"
+          className="absolute top-[-13px] left-[-13px] w-6 h-6"
+        />
         <img
           src={plusSign}
           alt="Plus Sign"
@@ -44,7 +62,7 @@ const UpdateModal = ({ onClose, updateData }) => {
           <ArrowPattern progress={progress} />
         </div>
 
-        {/* Tampilkan pesan berdasarkan updateData */}
+        {/* Tampilkan pesan sesuai kondisi */}
         {updateData ? (
           <p className="text-[#00FFE7] text-3xl mt-10">Checking for updates...</p>
         ) : (

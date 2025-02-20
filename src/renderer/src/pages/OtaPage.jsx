@@ -11,8 +11,10 @@ import backIcon from '../assets/back-Icon.svg'
 
 const OTA = () => {
   const BASE_URL = import.meta.env.VITE_BASE_URL
-  const UPDATE_URL = '/v1/update-version'
-  const CHECK_URL = '/v1/check-update-app'
+  const UPDATE_APP_URL = '/v1/update'
+  const UPDATE_Cyber_URL = '/v1/update-cyber-version'
+  const CHECK_APP_URL = '/v1/check-update-app'
+  const CHECK_Cyber_URL = '/v1/check-update-cyber'
   const LIST_VERSION_URL = '/v1/list-version'
 
   const navigate = useNavigate()
@@ -20,7 +22,9 @@ const OTA = () => {
   const [isNewVersionModalOpen, setIsNewVersionModalOpen] = useState(false)
   const [isUpdateProgressModalOpen, setIsUpdateProgressModalOpen] = useState(false)
   const [updateData, setUpdateData] = useState(null)
-  const [versionData, setVersionData] = useState(null) // state untuk list version
+  const [versionData, setVersionData] = useState(null)
+  // Menyimpan tipe update: 'app' atau 'cyber'
+  const [updateType, setUpdateType] = useState(null)
 
   // Fetch list version ketika komponen mount
   useEffect(() => {
@@ -47,11 +51,19 @@ const OTA = () => {
     fetchVersionList()
   }, [BASE_URL])
 
-  const checkAPPUpdate = async () => {
-    try {
-      setIsUpdateModalOpen(true)
+  // Fungsi pengecekan update untuk APP dan CYBER
+  const checkUpdate = async (type) => {
+    setUpdateType(type)
+    // Tampilkan modal loading update
+    setIsUpdateModalOpen(true)
 
-      const url = `${BASE_URL}${CHECK_URL}`
+    // Tentukan URL sesuai tipe update
+    const url =
+      type === 'app'
+        ? `${BASE_URL}${CHECK_APP_URL}`
+        : `${BASE_URL}${CHECK_Cyber_URL}`
+
+    try {
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -68,31 +80,41 @@ const OTA = () => {
       const data = await response.json()
       setUpdateData(data)
 
-      // Pengecekan FE melalui IPC
-      window.electron.ipcRenderer.send('start-fe-update')
-      window.electron.ipcRenderer.on('fe-update-status', (feStatus) => {
-        if (data.current_tag !== data.latest_remote_tag || feStatus.updateAvailable) {
-          setIsUpdateModalOpen(false)
+      if (type === 'app') {
+        // Pengecekan FE melalui IPC untuk APP
+        window.electron.ipcRenderer.send('start-fe-update')
+        window.electron.ipcRenderer.on('fe-update-status', (feStatus) => {
+          if (data.current_tag !== data.latest_remote_tag || feStatus.updateAvailable) {
+            setIsNewVersionModalOpen(true)
+          } else {
+            alert('Aplikasi sudah versi terbaru.')
+          }
+        })
+      } else {
+        // Untuk CYBER, cek properti update_available
+        if (data.update_available) {
           setIsNewVersionModalOpen(true)
         } else {
-          setIsUpdateModalOpen(false)
         }
-      })
+      }
     } catch (error) {
-      console.error(error)
+      console.error(`Error checking ${type} update:`, error)
       setIsUpdateModalOpen(false)
       alert(`Error: ${error.message}`)
     }
   }
 
+  // Fungsi untuk memproses update (untuk APP dan CYBER)
   const handleUpdate = async () => {
     setIsNewVersionModalOpen(false)
     setIsUpdateProgressModalOpen(true)
 
-    try {
-      const url = `${BASE_URL}${UPDATE_URL}`
-      console.log('Updating to latest version:', url)
+    const url =
+      updateType === 'app'
+        ? `${BASE_URL}${UPDATE_APP_URL}`
+        : `${BASE_URL}${UPDATE_Cyber_URL}`
 
+    try {
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -102,25 +124,32 @@ const OTA = () => {
         body: JSON.stringify({})
       })
 
-      console.log('Response status:', response.status)
-
       if (!response.ok) {
         throw new Error(`Network response was not ok. Status: ${response.status}`)
       }
 
       const data = await response.json()
-      console.log('Update response:', data)
 
-      if (data.status === 'success') {
-        // Trigger update FE via IPC
-        window.electron.ipcRenderer.send('start-fe-update')
+      if (updateType === 'app') {
+        if (data.status === 'success') {
+          // Trigger update FE via IPC
+          window.electron.ipcRenderer.send('start-fe-update')
+          setIsUpdateProgressModalOpen(false)
+          alert('Update aplikasi berhasil.')
+        } else {
+          throw new Error(data.message || 'Update gagal')
+        }
       } else {
-        throw new Error(data.message || 'Update failed')
+        if (data.message === "Cyber version and IOCs updated successfully.") {
+          setIsUpdateProgressModalOpen(false)
+        } else {
+          throw new Error(data.message || 'Cyber update failed')
+        }
       }
     } catch (error) {
-      console.error('Error updating version:', error)
-      alert(`Failed to update. Error: ${error.message}`)
+      console.error(`Error updating ${updateType} version:`, error)
       setIsUpdateProgressModalOpen(false)
+      alert(`Failed to update ${updateType} version. Error: ${error.message}`)
     }
   }
 
@@ -147,13 +176,13 @@ const OTA = () => {
           style={{ backgroundImage: `url(${Border})` }}
         >
           <h2 className="text-white text-lg mb-2">
-            APP V.
+            APP {''}
             {versionData && versionData.app_versions.length > 0
               ? versionData.app_versions[0].app_version
-              : 'v1.1.1.2'}
+              : '1.1.1.2'}
           </h2>
           <button
-            onClick={checkAPPUpdate}
+            onClick={() => checkUpdate('app')}
             className="text-white py-1 px-4"
             style={{
               backgroundImage: `url(${UpdateBorder})`,
@@ -181,7 +210,7 @@ const OTA = () => {
               : 'V1.2.3.4'}
           </h2>
           <button
-            onClick={() => alert('Not implemented')}
+            onClick={() => checkUpdate('cyber')}
             className="text-white py-1 px-4"
             style={{
               backgroundImage: `url(${UpdateBorder})`,
@@ -240,7 +269,7 @@ const OTA = () => {
         </div>
       </div>
 
-      {/* Modal Update */}
+      {/* Modal Update (Loading) */}
       {isUpdateModalOpen && (
         <UpdateModal onClose={() => setIsUpdateModalOpen(false)} updateData={updateData} />
       )}
